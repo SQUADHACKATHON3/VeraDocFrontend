@@ -49,29 +49,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-dark-bg text-foreground font-sans selection:bg-primary/30 selection:text-primary-light">
+    <div className="h-screen bg-dark-bg text-foreground font-sans selection:bg-primary/30 selection:text-primary-light overflow-hidden flex flex-col">
       <Navbar />
 
-      <main className="flex min-h-screen pt-20">
-        {/* Left Column: Login Form (40%) */}
-        <div className="w-full lg:w-[40%] flex items-center justify-center p-6 md:p-12 relative z-10">
-          <div className="w-full max-w-md glass p-10 rounded-[2rem] border-white/10 shadow-2xl reveal active">
-            <div className="flex items-center gap-3 mb-10">
-              <div className="bg-primary p-2 rounded-xl">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-heading font-extrabold tracking-tight">VeraDoc</span>
-            </div>
-
-            <div className="mb-8">
-              <h1 className="text-4xl font-heading font-bold mb-2">Welcome back.</h1>
-              <p className="text-foreground/50 font-medium">Sign in to your account to continue verifying.</p>
+      <main className="flex-1 flex overflow-hidden">
+        {/* Left Column: Login Form */}
+        <div className="w-full lg:w-[45%] xl:w-[40%] flex items-center justify-center p-6 md:p-12 relative z-10 overflow-y-auto">
+          <div className="w-full max-w-md glass p-8 md:p-10 rounded-[2.5rem] border-white/10 shadow-2xl reveal active">
+            <div className="mb-10">
+              <h1 className="text-4xl md:text-5xl font-heading font-black mb-3 tracking-tight">Welcome back.</h1>
+              <p className="text-foreground/50 font-medium text-lg">Sign in to continue verifying.</p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Email Field */}
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-foreground/40 ml-1">Email Address</label>
+                <label className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/40 ml-1">Email Address</label>
                 <input
                   {...register("email", { 
                     required: "Email is required",
@@ -90,7 +83,7 @@ export default function LoginPage() {
               {/* Password Field */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
-                  <label className="text-xs font-bold uppercase tracking-widest text-foreground/40">Password</label>
+                  <label className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/40">Password</label>
                   <button type="button" className="text-xs font-bold text-primary hover:text-primary-light transition-colors">Forgot password?</button>
                 </div>
                 <div className="relative">
@@ -121,7 +114,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-primary hover:bg-primary-light disabled:bg-primary/50 text-white font-bold py-4 rounded-2xl shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 group"
+                className="w-full bg-primary hover:bg-primary-light disabled:bg-primary/50 text-white font-bold py-4 rounded-2xl shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 group mt-4"
               >
                 {isLoading ? (
                   <>
@@ -134,7 +127,7 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <p className="text-center mt-8 text-foreground/50 font-medium">
+            <p className="text-center mt-10 text-foreground/50 font-medium">
               Don't have an account?{" "}
               <Link href="/auth/register" className="text-primary hover:text-primary-light font-bold transition-colors">
                 Get Started
@@ -143,50 +136,50 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Right Column: Branding (60%) */}
-        <div className="hidden lg:flex lg:w-[60%] bg-[#0A0E1A] relative items-center justify-center overflow-hidden border-l border-white/5">
+        {/* Right Column: Branding */}
+        <div className="hidden lg:flex lg:w-[55%] xl:w-[60%] bg-[#0A0E1A] relative items-center justify-center overflow-hidden border-l border-white/5">
           <div className="absolute inset-0 bg-dots opacity-20"></div>
           <div className="absolute inset-0 bg-glow-radial opacity-30"></div>
           
-          <div className="relative z-10 p-20 max-w-2xl text-center">
-            <h2 className="text-5xl font-heading font-black leading-tight text-white mb-6">
+          <div className="relative z-10 p-12 xl:p-20 max-w-2xl text-center">
+            <h2 className="text-4xl xl:text-5xl font-heading font-black leading-tight text-white mb-8">
               "One fake certificate. <br />
               One wrong hire. <br />
-              <span className="text-primary-light italic">One costly mistake."</span>
+              <span className="text-primary-light italic underline decoration-primary/30 underline-offset-8">One costly mistake."</span>
             </h2>
-            <p className="text-foreground/40 font-bold uppercase tracking-[0.3em] text-sm mb-16">
+            <p className="text-foreground/40 font-bold uppercase tracking-[0.4em] text-[10px] mb-16">
               VeraDoc helps Nigerian institutions verify smarter.
             </p>
 
-            <div className="space-y-6 relative">
+            <div className="space-y-6 relative max-w-md mx-auto">
               {/* Floating Stat Cards */}
-              <div className="glass p-6 rounded-2xl border-white/10 flex items-center gap-4 -rotate-2 hover:rotate-0 transition-transform duration-500">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                   <Shield className="w-6 h-6 text-primary" />
+              <div className="glass p-5 rounded-2xl border-white/10 flex items-center gap-4 -rotate-1 hover:rotate-0 transition-transform duration-500">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                   <Shield className="w-5 h-5 text-primary" />
                 </div>
                 <div className="text-left">
-                  <div className="text-2xl font-heading font-black text-white">10,000+</div>
-                  <div className="text-xs font-bold text-foreground/40 uppercase tracking-widest">documents verified</div>
+                  <div className="text-xl font-heading font-black text-white">10,000+</div>
+                  <div className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">documents verified</div>
                 </div>
               </div>
 
-              <div className="glass p-6 rounded-2xl border-white/10 flex items-center gap-4 rotate-1 translate-x-12 hover:rotate-0 hover:translate-x-0 transition-transform duration-500 shadow-2xl">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                   <Shield className="w-6 h-6 text-primary" />
+              <div className="glass p-5 rounded-2xl border-white/10 flex items-center gap-4 rotate-1 translate-x-8 hover:rotate-0 hover:translate-x-0 transition-transform duration-500 shadow-2xl">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                   <Shield className="w-5 h-5 text-primary" />
                 </div>
                 <div className="text-left">
-                  <div className="text-2xl font-heading font-black text-white">99.2%</div>
-                  <div className="text-xs font-bold text-foreground/40 uppercase tracking-widest">detection accuracy</div>
+                  <div className="text-xl font-heading font-black text-white">99.2%</div>
+                  <div className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">detection accuracy</div>
                 </div>
               </div>
 
-              <div className="glass p-6 rounded-2xl border-white/10 flex items-center gap-4 -rotate-1 hover:rotate-0 transition-transform duration-500">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                   <Shield className="w-6 h-6 text-primary" />
+              <div className="glass p-5 rounded-2xl border-white/10 flex items-center gap-4 -rotate-1 hover:rotate-0 transition-transform duration-500">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                   <Shield className="w-5 h-5 text-primary" />
                 </div>
                 <div className="text-left">
-                  <div className="text-2xl font-heading font-black text-white">&lt; 8 seconds</div>
-                  <div className="text-xs font-bold text-foreground/40 uppercase tracking-widest">average verification time</div>
+                  <div className="text-xl font-heading font-black text-white">&lt; 8 seconds</div>
+                  <div className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">average verification time</div>
                 </div>
               </div>
             </div>
@@ -194,5 +187,6 @@ export default function LoginPage() {
         </div>
       </main>
     </div>
+
   );
 }
