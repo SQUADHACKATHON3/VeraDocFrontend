@@ -1,7 +1,7 @@
 # VeraDoc — Frontend PRD
 **Owner:** Samkiel (Samuel Ezekiel)
 **Repo:** github.com/SQAUDHACKATHON/VeraDocFrontend
-**Stack:** Next.js 14, Tailwind CSS, NextAuth.js, MongoDB (Mongoose)
+**Stack:** Next.js 16 (Latest), React 19, Tailwind CSS v4, Auth.js, MongoDB (Mongoose)
 **Deployment:** Vercel
 **Last Updated:** May 2026
 
@@ -34,7 +34,7 @@ This document defines the complete frontend product requirements for VeraDoc. It
 
 ### 3.1 Landing Page (`/`)
 
-**Purpose:** Introduce VeraDoc, communicate value proposition, drive sign-up.
+**Purpose:** Introduce VeraDoc, communicate value proposition, drive sign-up with a "WOW" factor.
 
 **Sections:**
 - **Hero:** Product name, one-liner, two CTAs — "Get Started" (→ `/auth/register`) and "See How It Works" (scrolls to How It Works section)
@@ -52,21 +52,21 @@ This document defines the complete frontend product requirements for VeraDoc. It
 
 ### 3.2 Login Page (`/auth/login`)
 
-**Purpose:** Authenticate existing users via NextAuth.
+**Purpose:** Authenticate existing users via Auth.js.
 
 **Fields:**
 - Email (required)
 - Password (required)
 
 **Actions:**
-- Submit → NextAuth `signIn()` with credentials provider
+- Submit → Auth.js `signIn()` with credentials provider
 - "Don't have an account?" → `/auth/register`
 - "Forgot password?" → placeholder (not in scope for hackathon)
 
 **States:**
 - Default
-- Loading (form disabled, spinner on button)
-- Error (invalid credentials — show inline error message)
+- Loading (form disabled, premium spinner/skeleton)
+- Error (invalid credentials — show high-fidelity toast/inline error)
 - Success → redirect to `/dashboard`
 
 ---
@@ -89,7 +89,7 @@ This document defines the complete frontend product requirements for VeraDoc. It
 **States:**
 - Default
 - Loading
-- Validation errors (inline per field)
+- Validation errors (inline per field, real-time validation)
 - Server error (email already exists)
 - Success → redirect
 
