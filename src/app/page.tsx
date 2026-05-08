@@ -13,7 +13,7 @@ import {
   TrendingUp, 
   Clock, 
   AlertTriangle,
-  Github
+  ExternalLink
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -342,7 +342,7 @@ export default function LandingPage() {
               <ul className="space-y-4 text-foreground/50">
                 <li>
                   <Link href="https://github.com/SQUADHACKATHON3" target="_blank" className="flex items-center gap-2 hover:text-primary transition-colors">
-                    <Github className="w-5 h-5" /> GitHub
+                    <ExternalLink className="w-5 h-5" /> GitHub
                   </Link>
                 </li>
               </ul>
