@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Outfit } from "next/font/google";
 import "./globals.css";
+import { Providers } from "./providers";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -28,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${playfair.variable} ${outfit.variable} antialiased`}>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
 
