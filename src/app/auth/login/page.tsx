@@ -49,16 +49,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="h-screen bg-dark-bg text-foreground font-sans selection:bg-primary/30 selection:text-primary-light overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-dark-bg text-foreground font-sans selection:bg-primary/30 selection:text-primary-light">
       <Navbar />
 
-      <main className="flex-1 flex overflow-hidden">
+      <main className="flex flex-col lg:flex-row min-h-screen">
         {/* Left Column: Login Form */}
-        <div className="w-full lg:w-[45%] xl:w-[40%] flex items-center justify-center p-6 md:p-12 relative z-10 overflow-y-auto">
+        <div className="w-full lg:w-[45%] xl:w-[40%] flex items-center justify-center p-6 md:p-12 pt-40 lg:pt-32 relative z-10">
           <div className="w-full max-w-md glass p-8 md:p-10 rounded-[2.5rem] border-white/10 shadow-2xl reveal active">
             <div className="mb-10">
-              <h1 className="text-4xl md:text-5xl font-heading font-black mb-3 tracking-tight">Welcome back.</h1>
-              <p className="text-foreground/50 font-medium text-lg">Sign in to continue verifying.</p>
+              <h1 className="text-3xl md:text-4xl font-heading font-black mb-3 tracking-tight">Welcome back.</h1>
+              <p className="text-foreground/50 font-medium">Sign in to continue verifying.</p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -114,7 +114,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-primary hover:bg-primary-light disabled:bg-primary/50 text-white font-bold py-4 rounded-2xl shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 group mt-4"
+                className="w-full bg-primary hover:bg-primary-light disabled:bg-primary/50 text-white font-bold py-4 rounded-2xl shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 group mt-2"
               >
                 {isLoading ? (
                   <>
@@ -137,23 +137,23 @@ export default function LoginPage() {
         </div>
 
         {/* Right Column: Branding */}
-        <div className="hidden lg:flex lg:w-[55%] xl:w-[60%] bg-[#0A0E1A] relative items-center justify-center overflow-hidden border-l border-white/5">
+        <div className="hidden lg:flex lg:w-[55%] xl:w-[60%] bg-[#0A0E1A] relative items-center justify-center overflow-hidden border-l border-white/5 pt-32 lg:pt-20">
           <div className="absolute inset-0 bg-dots opacity-20"></div>
           <div className="absolute inset-0 bg-glow-radial opacity-30"></div>
           
           <div className="relative z-10 p-12 xl:p-20 max-w-2xl text-center">
-            <h2 className="text-4xl xl:text-5xl font-heading font-black leading-tight text-white mb-8">
+            <h2 className="text-3xl xl:text-4xl font-heading font-black leading-tight text-white mb-8">
               "One fake certificate. <br />
               One wrong hire. <br />
               <span className="text-primary-light italic underline decoration-primary/30 underline-offset-8">One costly mistake."</span>
             </h2>
-            <p className="text-foreground/40 font-bold uppercase tracking-[0.4em] text-[10px] mb-16">
+            <p className="text-foreground/40 font-bold uppercase tracking-[0.4em] text-[10px] mb-12">
               VeraDoc helps Nigerian institutions verify smarter.
             </p>
 
-            <div className="space-y-6 relative max-w-md mx-auto">
+            <div className="space-y-4 relative max-w-sm mx-auto">
               {/* Floating Stat Cards */}
-              <div className="glass p-5 rounded-2xl border-white/10 flex items-center gap-4 -rotate-1 hover:rotate-0 transition-transform duration-500">
+              <div className="glass p-4 rounded-2xl border-white/10 flex items-center gap-4 -rotate-1 hover:rotate-0 transition-transform duration-500">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                    <Shield className="w-5 h-5 text-primary" />
                 </div>
@@ -163,7 +163,7 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <div className="glass p-5 rounded-2xl border-white/10 flex items-center gap-4 rotate-1 translate-x-8 hover:rotate-0 hover:translate-x-0 transition-transform duration-500 shadow-2xl">
+              <div className="glass p-4 rounded-2xl border-white/10 flex items-center gap-4 rotate-1 translate-x-8 hover:rotate-0 hover:translate-x-0 transition-transform duration-500 shadow-2xl">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                    <Shield className="w-5 h-5 text-primary" />
                 </div>
@@ -173,7 +173,7 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <div className="glass p-5 rounded-2xl border-white/10 flex items-center gap-4 -rotate-1 hover:rotate-0 transition-transform duration-500">
+              <div className="glass p-4 rounded-2xl border-white/10 flex items-center gap-4 -rotate-1 hover:rotate-0 transition-transform duration-500">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                    <Shield className="w-5 h-5 text-primary" />
                 </div>
@@ -187,6 +187,7 @@ export default function LoginPage() {
         </div>
       </main>
     </div>
+
 
   );
 }
