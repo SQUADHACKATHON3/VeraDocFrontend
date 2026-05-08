@@ -10,7 +10,6 @@ import {
   Menu, 
   X, 
   ArrowRight, 
-  TrendingUp, 
   Clock, 
   AlertTriangle,
   ExternalLink
@@ -44,7 +43,8 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-dark-bg text-foreground font-sans selection:bg-primary/30 selection:text-primary-light">
       {/* Navbar */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "glass py-3" : "bg-transparent py-5"}`}>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "glass py-3" : "bg-transparent py-4"}`}>
+
         <div className="container mx-auto px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
             <div className="bg-primary p-1.5 rounded-lg group-hover:scale-110 transition-transform">
@@ -86,7 +86,8 @@ export default function LandingPage() {
 
       <main>
         {/* Hero Section */}
-        <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+        <section className="relative pt-24 pb-16 md:pt-36 md:pb-24 overflow-hidden">
+
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-dots pointer-events-none opacity-40"></div>
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-glow-radial pointer-events-none"></div>
           
@@ -121,62 +122,49 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Floating Card Mockup */}
-              <div className="lg:w-2/5 relative reveal" style={{ transitionDelay: "600ms" }}>
-                <div className="relative w-full aspect-[4/5] max-w-[400px] mx-auto">
-                  <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full"></div>
-                  <div className="relative glass rounded-2xl p-6 h-full flex flex-col border-white/20 shadow-2xl">
-                    <div className="flex items-center justify-between mb-8">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded bg-primary/20 flex items-center justify-center">
-                          <Shield className="w-4 h-4 text-primary" />
-                        </div>
-                        <div className="h-2 w-24 bg-white/10 rounded"></div>
-                      </div>
-                      <div className="h-6 w-16 bg-primary/20 rounded-full border border-primary/30 flex items-center justify-center">
-                        <span className="text-[10px] text-primary font-bold">VERIFIED</span>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-4 mb-8">
-                      <div className="h-3 w-full bg-white/10 rounded"></div>
-                      <div className="h-3 w-4/5 bg-white/10 rounded"></div>
-                      <div className="h-3 w-2/3 bg-white/10 rounded"></div>
-                    </div>
-
-                    <div className="mt-auto pt-6 border-t border-white/10">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 rounded-full bg-white/10"></div>
-                        <div className="space-y-2">
-                          <div className="h-2 w-20 bg-white/10 rounded"></div>
-                          <div className="h-2 w-12 bg-white/5 rounded"></div>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-end">
-                        <div className="space-y-2">
-                          <div className="text-[10px] text-foreground/40 font-bold uppercase tracking-wider">Trust Score</div>
-                          <div className="text-3xl font-heading font-black text-primary-light tracking-tighter">98.4%</div>
-                        </div>
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-                           <TrendingUp className="w-6 h-6 text-primary" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              {/* Minimal Surgical UI Element */}
+              <div className="lg:w-2/5 flex justify-center lg:justify-end reveal" style={{ transitionDelay: "600ms" }}>
+                <div className="relative w-[280px] group">
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full opacity-50 group-hover:opacity-70 transition-opacity"></div>
                   
-                  {/* Decorative Elements */}
-                  <div className="absolute -top-4 -right-4 w-24 h-24 glass rounded-xl flex flex-col items-center justify-center border-primary/30 animate-bounce [animation-duration:4s]">
-                    <CheckCircle className="w-8 h-8 text-primary mb-1" />
-                    <span className="text-[8px] font-bold">AUTHENTIC</span>
+                  {/* Glass Card */}
+                  <div className="relative glass rounded-3xl p-8 border-white/10 shadow-[0_20px_50px_rgba(8,11,20,0.5),0_0_30px_rgba(37,99,235,0.1)] -rotate-3 hover:rotate-0 transition-all duration-700 ease-out">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
+                        <Shield className="w-7 h-7 text-primary-light" />
+                      </div>
+                      
+                      <div className="text-[10px] font-bold tracking-[0.3em] text-primary-light uppercase mb-2">Verified</div>
+                      <div className="text-5xl font-heading font-black text-white mb-6 tracking-tighter">98.4%</div>
+                      
+                      <div className="w-full h-px bg-white/10 mb-6"></div>
+                      
+                      <div className="w-full space-y-4 text-left font-sans">
+                        <div className="flex items-center gap-3 text-[11px] text-foreground/70 font-medium">
+                          <span className="text-primary-light text-xs">✓</span>
+                          <span>Font consistency passed</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-[11px] text-foreground/70 font-medium">
+                          <span className="text-primary-light text-xs">✓</span>
+                          <span>Seal integrity passed</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-[11px] text-amber-400/80 font-medium">
+                          <span className="text-xs">⚠</span>
+                          <span>Minor formatting anomaly</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
+
             </div>
           </div>
         </section>
 
         {/* Problem Section */}
-        <section className="py-24 bg-dark-bg relative">
+        <section className="py-16 bg-dark-bg relative">
           <div className="container mx-auto px-6">
             <div className="max-w-3xl mx-auto text-center mb-16 reveal">
               <h2 className="text-3xl md:text-5xl font-heading font-bold mb-6">
@@ -208,7 +196,7 @@ export default function LandingPage() {
         </section>
 
         {/* How It Works Section */}
-        <section id="how-it-works" className="py-24 relative overflow-hidden">
+        <section id="how-it-works" className="py-16 relative overflow-hidden">
           <div className="absolute inset-0 bg-primary/5 -skew-y-3 origin-right"></div>
           <div className="container mx-auto px-6 relative z-10">
             <div className="text-center mb-20 reveal">
@@ -242,7 +230,7 @@ export default function LandingPage() {
         </section>
 
         {/* Pricing Section */}
-        <section id="pricing" className="py-24">
+        <section id="pricing" className="py-16">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16 reveal">
               <h2 className="text-4xl md:text-5xl font-heading font-bold mb-4">Simple, transparent pricing.</h2>
@@ -298,7 +286,7 @@ export default function LandingPage() {
         </section>
 
         {/* CTA Banner */}
-        <section className="py-20 px-6">
+        <section className="py-16 px-6">
           <div className="container mx-auto">
             <div className="glass bg-gradient-to-br from-primary/20 to-transparent border-primary/20 rounded-[40px] p-12 md:p-20 text-center relative overflow-hidden reveal">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-glow-radial opacity-50"></div>
@@ -319,7 +307,7 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="pt-20 pb-10 border-t border-white/5">
+      <footer className="pt-16 pb-10 border-t border-white/5">
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-12 mb-20">
             <div className="col-span-2">
