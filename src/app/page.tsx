@@ -50,20 +50,21 @@ export default function LandingPage() {
             <div className="bg-primary p-1.5 rounded-lg group-hover:scale-110 transition-transform">
               <Shield className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-heading font-bold tracking-tight">VeraDoc</span>
+            <span className="text-2xl font-heading font-extrabold tracking-tight">VeraDoc</span>
           </Link>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
-            <Link href="#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">How It Works</Link>
-            <Link href="#pricing" className="text-sm font-medium hover:text-primary transition-colors">Pricing</Link>
+            <Link href="#how-it-works" className="text-sm font-medium tracking-wide hover:text-primary transition-colors">How It Works</Link>
+            <Link href="#pricing" className="text-sm font-medium tracking-wide hover:text-primary transition-colors">Pricing</Link>
             <div className="flex items-center gap-4 ml-4">
-              <Link href="/auth/login" className="text-sm font-medium hover:text-primary transition-colors">Sign In</Link>
-              <Link href="/auth/register" className="bg-primary hover:bg-primary-light text-white px-5 py-2 rounded-full text-sm font-semibold transition-all hover:shadow-[0_0_20px_rgba(37,99,235,0.4)]">
+              <Link href="/auth/login" className="text-sm font-medium tracking-wide hover:text-primary transition-colors">Sign In</Link>
+              <Link href="/auth/register" className="bg-primary hover:bg-primary-light text-white px-5 py-2 rounded-full text-sm font-semibold tracking-wide transition-all hover:shadow-[0_0_20px_rgba(37,99,235,0.4)]">
                 Get Started
               </Link>
             </div>
           </div>
+
 
           {/* Mobile Toggle */}
           <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -100,7 +101,7 @@ export default function LandingPage() {
                   Trusted by institutions across Nigeria
                 </div>
                 
-                <h1 className="text-5xl md:text-7xl font-heading font-extrabold leading-[1.1] mb-6 reveal">
+                <h1 className="text-5xl md:text-7xl font-heading font-black leading-[1.1] mb-6 reveal">
                   Stop Trusting. <br />
                   <span className="text-primary-light">Start Verifying.</span>
                 </h1>
@@ -154,7 +155,7 @@ export default function LandingPage() {
                       <div className="flex justify-between items-end">
                         <div className="space-y-2">
                           <div className="text-[10px] text-foreground/40 font-bold uppercase tracking-wider">Trust Score</div>
-                          <div className="text-3xl font-heading font-bold text-primary-light tracking-tighter">98.4%</div>
+                          <div className="text-3xl font-heading font-black text-primary-light tracking-tighter">98.4%</div>
                         </div>
                         <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
                            <TrendingUp className="w-6 h-6 text-primary" />
@@ -253,8 +254,9 @@ export default function LandingPage() {
                 <h3 className="text-xl font-heading font-bold mb-2">Pay-As-You-Go</h3>
                 <div className="flex items-baseline gap-1 mb-6">
                   <span className="text-4xl font-heading font-bold">₦1,000</span>
-                  <span className="text-foreground/50">/verification</span>
+                  <span className="text-foreground/50 font-sans">/verification</span>
                 </div>
+
                 <ul className="space-y-4 mb-10 flex-grow">
                   {[ "No commitment", "Best for low volume", "Instant AI analysis", "Shareable report link" ].map((feature, i) => (
                     <li key={i} className="flex items-center gap-3 text-foreground/70">
@@ -277,7 +279,7 @@ export default function LandingPage() {
                   <h3 className="text-xl font-heading font-bold mb-2">Monthly Plan</h3>
                   <div className="flex items-baseline gap-1 mb-6">
                     <span className="text-4xl font-heading font-bold">₦50,000</span>
-                    <span className="text-foreground/50">/month</span>
+                    <span className="text-foreground/50 font-sans">/month</span>
                   </div>
                   <ul className="space-y-4 mb-10 flex-grow">
                     {[ "Unlimited verifications", "Best for HR teams", "API access", "Priority institution checks", "Team management" ].map((feature, i) => (
@@ -301,7 +303,7 @@ export default function LandingPage() {
             <div className="glass bg-gradient-to-br from-primary/20 to-transparent border-primary/20 rounded-[40px] p-12 md:p-20 text-center relative overflow-hidden reveal">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-glow-radial opacity-50"></div>
               <div className="relative z-10">
-                <h2 className="text-4xl md:text-6xl font-heading font-extrabold mb-6 leading-tight">
+                <h2 className="text-4xl md:text-6xl font-heading font-black mb-6 leading-tight">
                   Your next bad hire could <br /> cost you everything.
                 </h2>
                 <p className="text-xl text-foreground/60 mb-10 max-w-xl mx-auto">
@@ -323,7 +325,7 @@ export default function LandingPage() {
             <div className="col-span-2">
               <Link href="/" className="flex items-center gap-2 mb-6">
                 <Shield className="w-8 h-8 text-primary" />
-                <span className="text-2xl font-heading font-bold">VeraDoc</span>
+                <span className="text-2xl font-heading font-extrabold">VeraDoc</span>
               </Link>
               <p className="text-foreground/50 max-w-xs leading-relaxed">
                 AI-powered document trust for a more transparent educational ecosystem in Nigeria.
@@ -339,6 +341,7 @@ export default function LandingPage() {
             </div>
             <div>
               <h4 className="font-heading font-bold mb-6">Connect</h4>
+
               <ul className="space-y-4 text-foreground/50">
                 <li>
                   <Link href="https://github.com/SQUADHACKATHON3" target="_blank" className="flex items-center gap-2 hover:text-primary transition-colors">

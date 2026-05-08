@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
-import { Syne, DM_Sans } from "next/font/google";
+import { Playfair_Display, Outfit } from "next/font/google";
 import "./globals.css";
 
-const syne = Syne({
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-syne",
+  weight: ["700", "800", "900"],
+  variable: "--font-playfair",
 });
 
-const dmSans = DM_Sans({
+const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-outfit",
 });
+
 
 export const metadata: Metadata = {
   title: "VeraDoc | AI-Powered Certificate Verification",
@@ -24,9 +27,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${syne.variable} ${dmSans.variable} antialiased`}>
+      <body className={`${playfair.variable} ${outfit.variable} antialiased`}>
         {children}
       </body>
     </html>
+
   );
 }
