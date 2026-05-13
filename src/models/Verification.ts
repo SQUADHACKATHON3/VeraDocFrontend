@@ -4,6 +4,7 @@ const VerificationSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     documentName: { type: String, required: true },
+    fileBase64: { type: String },
     squadTransactionRef: { type: String },
     paymentStatus: { type: String, enum: ['pending', 'paid', 'failed'], default: 'pending' },
     status: { type: String, enum: ['pending', 'processing', 'complete', 'error'], default: 'pending' },
