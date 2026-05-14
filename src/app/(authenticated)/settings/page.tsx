@@ -91,7 +91,7 @@ export default function SettingsPage() {
 
       {/* Section 1: Profile Information */}
       <section className="space-y-4 reveal active" style={{ transitionDelay: "100ms" }}>
-        <div className="glass p-8 rounded-[2.5rem] border-white/5 space-y-6">
+        <div className="glass p-8 rounded-[2.5rem] space-y-6">
           <p className="text-[10px] font-bold text-primary uppercase tracking-[0.3em]">Profile</p>
           
           <div className="space-y-6">
@@ -105,7 +105,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="h-px bg-white/5"></div>
+            <div className="h-px bg-card-border"></div>
 
             <div className="flex items-center gap-6">
               <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-foreground/20">
@@ -117,7 +117,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="h-px bg-white/5"></div>
+            <div className="h-px bg-card-border"></div>
 
             <div className="flex items-center justify-between gap-6">
               <div className="flex items-center gap-6">
@@ -134,7 +134,7 @@ export default function SettingsPage() {
               </span>
             </div>
 
-            <div className="h-px bg-white/5"></div>
+            <div className="h-px bg-card-border"></div>
 
             <div className="flex items-center gap-6">
               <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary-light">
@@ -153,7 +153,7 @@ export default function SettingsPage() {
 
       {/* Section 2: Change Password */}
       <section className="space-y-4 reveal active" style={{ transitionDelay: "200ms" }}>
-        <div className="glass p-8 rounded-[2.5rem] border-white/5">
+        <div className="glass p-8 rounded-[2.5rem]">
           <p className="text-[10px] font-bold text-primary uppercase tracking-[0.3em] mb-8">Security</p>
           
           <form onSubmit={handleSubmit(onUpdatePassword)} className="space-y-6">
@@ -164,7 +164,7 @@ export default function SettingsPage() {
                   {...register("currentPassword", { required: "Current password is required" })}
                   type={showCurrent ? "text" : "password"}
                   disabled={isLoading}
-                  className={`w-full bg-white/5 border ${errors.currentPassword || error?.includes("Current") ? 'border-red-500/50' : 'border-white/10'} focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-2xl px-5 py-4 outline-none transition-all font-medium text-sm`}
+                  className={`w-full bg-card border ${errors.currentPassword || error?.includes("Current") ? 'border-red-500' : 'border-card-border'} focus:border-primary rounded-2xl px-5 py-4 outline-none transition-all font-medium text-sm`}
                 />
                 <button type="button" onClick={() => setShowCurrent(!showCurrent)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/50 transition-colors">
                   {showCurrent ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -186,7 +186,7 @@ export default function SettingsPage() {
                     })}
                     type={showNew ? "text" : "password"}
                     disabled={isLoading}
-                    className={`w-full bg-white/5 border ${errors.newPassword ? 'border-red-500/50' : 'border-white/10'} focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-2xl px-5 py-4 outline-none transition-all font-medium text-sm`}
+                    className={`w-full bg-card border ${errors.newPassword ? 'border-red-500' : 'border-card-border'} focus:border-primary rounded-2xl px-5 py-4 outline-none transition-all font-medium text-sm`}
                   />
                   <button type="button" onClick={() => setShowNew(!showNew)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/50 transition-colors">
                     {showNew ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -205,7 +205,7 @@ export default function SettingsPage() {
                     })}
                     type={showConfirm ? "text" : "password"}
                     disabled={isLoading}
-                    className={`w-full bg-white/5 border ${errors.confirmNewPassword ? 'border-red-500/50' : 'border-white/10'} focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-2xl px-5 py-4 outline-none transition-all font-medium text-sm`}
+                    className={`w-full bg-card border ${errors.confirmNewPassword ? 'border-red-500' : 'border-card-border'} focus:border-primary rounded-2xl px-5 py-4 outline-none transition-all font-medium text-sm`}
                   />
                   <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/50 transition-colors">
                     {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -230,7 +230,7 @@ export default function SettingsPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-primary hover:bg-primary-light disabled:bg-primary/50 text-white font-bold py-4 rounded-2xl shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+                className="w-full bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-white font-bold py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
               >
                 {isLoading ? (
                   <>
@@ -248,15 +248,15 @@ export default function SettingsPage() {
 
       {/* Section 3: Danger Zone */}
       <section className="space-y-4 reveal active" style={{ transitionDelay: "300ms" }}>
-        <div className="glass p-8 rounded-[2.5rem] border-red-500/20 bg-red-500/[0.02]">
+        <div className="glass p-8 rounded-[2.5rem]">
           <p className="text-[10px] font-bold text-red-500 uppercase tracking-[0.3em] mb-6">Danger Zone</p>
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <p className="text-sm font-medium text-foreground/40 leading-relaxed text-center md:text-left">
               Permanently delete your account and all verification history. This action cannot be undone.
             </p>
-            <button 
+            <button
               onClick={() => setShowDeleteModal(true)}
-              className="px-8 py-3 rounded-xl border border-red-500/30 text-red-500 font-bold text-xs hover:bg-red-500 hover:text-white transition-all whitespace-nowrap"
+              className="px-8 py-3 rounded-xl border border-[#DC2626] text-[#DC2626] font-bold text-xs hover:bg-[#DC2626] hover:text-white transition-all whitespace-nowrap"
             >
               Delete Account
             </button>
@@ -267,8 +267,8 @@ export default function SettingsPage() {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 md:p-10">
-          <div className="absolute inset-0 bg-dark-bg/80 backdrop-blur-md" onClick={() => setShowDeleteModal(false)}></div>
-          <div className="relative w-full max-w-md glass p-10 rounded-[3rem] border-red-500/30 shadow-2xl space-y-8 reveal active">
+          <div className="absolute inset-0 bg-dark-bg/80" onClick={() => setShowDeleteModal(false)}></div>
+          <div className="relative w-full max-w-md glass p-10 rounded-[3rem] shadow-sharp space-y-8 reveal active">
             <button type="button" aria-label="Close" onClick={() => setShowDeleteModal(false)} className="absolute right-8 top-8 p-2 rounded-lg hover:bg-white/5 text-foreground/20 hover:text-white transition-all">
               <X className="w-5 h-5" />
             </button>
@@ -291,7 +291,7 @@ export default function SettingsPage() {
                 type="text" 
                 value={deleteConfirmText}
                 onChange={(e) => setDeleteConfirmText(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 focus:border-red-500/50 focus:ring-4 focus:ring-red-500/10 rounded-2xl px-5 py-4 outline-none transition-all font-bold text-center tracking-widest text-white placeholder:text-white/10"
+                className="w-full bg-card border border-card-border focus:border-red-500 rounded-2xl px-5 py-4 outline-none transition-all font-bold text-center tracking-widest text-white placeholder:text-white/10"
                 placeholder="DELETE"
               />
             </div>
@@ -300,7 +300,7 @@ export default function SettingsPage() {
               <button 
                 onClick={onDeleteAccount}
                 disabled={deleteConfirmText !== "DELETE" || isLoading}
-                className="w-full bg-red-500 hover:bg-red-600 disabled:bg-red-500/20 text-white font-bold py-5 rounded-2xl shadow-xl shadow-red-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+                className="w-full bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-red-500/20 text-white font-bold py-5 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
               >
                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
                 Delete Account

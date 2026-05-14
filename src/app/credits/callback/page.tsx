@@ -47,7 +47,7 @@ function CallbackContent() {
 
   return (
     <div className="min-h-screen bg-dark-bg text-foreground font-sans flex items-center justify-center p-6">
-      <div className="relative w-full max-w-md glass p-8 md:p-10 rounded-[3rem] border-white/10 shadow-2xl space-y-6 text-center">
+      <div className="relative w-full max-w-md glass p-8 md:p-10 rounded-[3rem] space-y-6 text-center">
         <Link
           href="/"
           className="inline-flex items-center gap-2 text-foreground/40 hover:text-white transition-colors"
@@ -74,7 +74,7 @@ function CallbackContent() {
         </div>
 
         {reference && (
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+          <div className="bg-card border border-card-border rounded-2xl p-4">
             <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/40 mb-1">
               Transaction reference
             </p>
@@ -89,7 +89,7 @@ function CallbackContent() {
             <button
               type="button"
               onClick={() => window.close()}
-              className="w-full bg-primary hover:bg-primary-light text-white font-bold py-4 rounded-2xl shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               Close this tab
             </button>
@@ -99,7 +99,7 @@ function CallbackContent() {
             className={`w-full font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-3 ${
               canClose
                 ? "text-foreground/40 hover:text-white"
-                : "bg-primary hover:bg-primary-light text-white shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]"
+                : "bg-primary hover:bg-primary-hover text-white hover:scale-[1.02] active:scale-[0.98]"
             }`}
           >
             Back to VeraDoc <ArrowRight className="w-4 h-4" />

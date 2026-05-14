@@ -57,7 +57,7 @@ export default function DashboardLayout({
   return (
     <div className="min-h-screen bg-dark-bg text-foreground font-sans flex flex-col lg:flex-row">
       {/* Sidebar (Desktop) */}
-      <aside className="hidden lg:flex w-64 flex-col fixed inset-y-0 border-r border-white/5 glass z-50">
+      <aside className="hidden lg:flex w-64 flex-col fixed inset-y-0 border-r border-card-border bg-sidebar z-50">
         <div className="p-6">
           <Link href="/" className="flex items-center gap-2 group">
             <div className="bg-primary p-1.5 rounded-lg">
@@ -96,7 +96,7 @@ export default function DashboardLayout({
                 href={item.href}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all group ${
                   isActive
-                    ? "bg-primary/10 text-primary border-l-4 border-primary"
+                    ? "bg-card text-primary border-l-[3px] border-primary"
                     : "hover:bg-white/5 text-foreground/60 hover:text-white"
                 }`}
               >
@@ -113,7 +113,7 @@ export default function DashboardLayout({
           })}
         </nav>
 
-        <div className="p-4 mt-auto border-t border-white/5">
+        <div className="p-4 mt-auto border-t border-card-border">
           <div className="flex items-center gap-3 p-2 mb-4">
             <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary-light font-bold">
               {userInitials}
@@ -139,7 +139,7 @@ export default function DashboardLayout({
       </aside>
 
       {/* Mobile Bottom Nav */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 glass border-t border-white/5 z-50 flex justify-around p-3">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-sidebar border-t border-card-border z-50 flex justify-around p-3">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (

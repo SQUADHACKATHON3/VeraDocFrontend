@@ -66,7 +66,7 @@ export default function RegisterPage() {
       <main className="flex flex-col lg:flex-row min-h-screen">
         {/* Left Column: Register Form */}
         <div className="w-full lg:w-[45%] xl:w-[40%] flex items-center justify-center p-6 md:p-12 pt-40 lg:pt-32 relative z-10">
-          <div className="w-full max-w-md glass p-8 md:p-10 rounded-[2.5rem] border-white/10 shadow-2xl reveal active">
+          <div className="w-full max-w-md glass p-8 md:p-10 rounded-[2.5rem] reveal active">
             <div className="mb-8">
               <h1 className="text-3xl md:text-4xl font-heading font-black mb-3 tracking-tight">Create your account.</h1>
               <p className="text-foreground/50 font-medium">Start verifying documents in minutes.</p>
@@ -79,7 +79,7 @@ export default function RegisterPage() {
                 <input
                   {...register("fullName", { required: "Full name is required" })}
                   disabled={isLoading}
-                  className={`w-full bg-white/5 border ${errors.fullName ? 'border-red-500/50' : 'border-white/10'} focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-xl px-5 py-3.5 outline-none transition-all font-medium placeholder:text-white/10`}
+                  className={`w-full bg-card border ${errors.fullName ? 'border-red-500' : 'border-card-border'} focus:border-primary rounded-xl px-5 py-3.5 outline-none transition-all font-medium placeholder:text-white/10`}
                   placeholder="John Doe"
                 />
                 {errors.fullName && <p className="text-red-500 text-[10px] mt-1 ml-1 font-medium">{errors.fullName.message}</p>}
@@ -91,7 +91,7 @@ export default function RegisterPage() {
                 <input
                   {...register("organisation", { required: "Organisation name is required" })}
                   disabled={isLoading}
-                  className={`w-full bg-white/5 border ${errors.organisation ? 'border-red-500/50' : 'border-white/10'} focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-xl px-5 py-3.5 outline-none transition-all font-medium placeholder:text-white/10`}
+                  className={`w-full bg-card border ${errors.organisation ? 'border-red-500' : 'border-card-border'} focus:border-primary rounded-xl px-5 py-3.5 outline-none transition-all font-medium placeholder:text-white/10`}
                   placeholder="Company, university, or agency"
                 />
                 {errors.organisation && <p className="text-red-500 text-[10px] mt-1 ml-1 font-medium">{errors.organisation.message}</p>}
@@ -109,7 +109,7 @@ export default function RegisterPage() {
                     }
                   })}
                   disabled={isLoading}
-                  className={`w-full bg-white/5 border ${errors.email || error?.includes("email") ? 'border-red-500/50' : 'border-white/10'} focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-xl px-5 py-3.5 outline-none transition-all font-medium placeholder:text-white/10`}
+                  className={`w-full bg-card border ${errors.email || error?.includes("email") ? 'border-red-500' : 'border-card-border'} focus:border-primary rounded-xl px-5 py-3.5 outline-none transition-all font-medium placeholder:text-white/10`}
                   placeholder="name@institution.edu.ng"
                 />
                 {(errors.email || (error && error.includes("email"))) && (
@@ -131,7 +131,7 @@ export default function RegisterPage() {
                       })}
                       type={showPassword ? "text" : "password"}
                       disabled={isLoading}
-                      className={`w-full bg-white/5 border ${errors.password ? 'border-red-500/50' : 'border-white/10'} focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-xl px-5 py-3.5 outline-none transition-all font-medium text-sm`}
+                      className={`w-full bg-card border ${errors.password ? 'border-red-500' : 'border-card-border'} focus:border-primary rounded-xl px-5 py-3.5 outline-none transition-all font-medium text-sm`}
                     />
                     <button
                       type="button"
@@ -154,7 +154,7 @@ export default function RegisterPage() {
                       })}
                       type={showConfirmPassword ? "text" : "password"}
                       disabled={isLoading}
-                      className={`w-full bg-white/5 border ${errors.confirmPassword ? 'border-red-500/50' : 'border-white/10'} focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-xl px-5 py-3.5 outline-none transition-all font-medium text-sm`}
+                      className={`w-full bg-card border ${errors.confirmPassword ? 'border-red-500' : 'border-card-border'} focus:border-primary rounded-xl px-5 py-3.5 outline-none transition-all font-medium text-sm`}
                     />
                     <button
                       type="button"
@@ -177,7 +177,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-primary hover:bg-primary-light disabled:bg-primary/50 text-white font-bold py-4 rounded-xl shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 group mt-2"
+                className="w-full bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-white font-bold py-4 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 group mt-2"
               >
                 {isLoading ? (
                   <>
@@ -200,10 +200,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Right Column: Branding */}
-        <div className="hidden lg:flex lg:w-[55%] xl:w-[60%] bg-[#0A0E1A] relative items-center justify-center overflow-hidden border-l border-white/5 pt-32 lg:pt-20">
-          <div className="absolute inset-0 bg-dots opacity-20"></div>
-          <div className="absolute inset-0 bg-glow-radial opacity-30"></div>
-          
+        <div className="hidden lg:flex lg:w-[55%] xl:w-[60%] bg-sidebar relative items-center justify-center overflow-hidden border-l border-card-border pt-32 lg:pt-20">
           <div className="relative z-10 p-12 xl:p-20 max-w-2xl text-center">
             <h2 className="text-3xl xl:text-5xl font-heading font-black leading-tight text-white mb-8">
               Join institutions <br />
@@ -219,7 +216,7 @@ export default function RegisterPage() {
                 "Payments secured through Squad",
                 "Results in under 10 seconds"
               ].map((feature, i) => (
-                <div key={i} className="glass p-5 rounded-2xl border-white/10 flex items-center gap-4 reveal active" style={{ transitionDelay: `${i * 100}ms` }}>
+                <div key={i} className="glass p-5 rounded-2xl flex items-center gap-4 reveal active" style={{ transitionDelay: `${i * 100}ms` }}>
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
                      <CheckCircle className="w-5 h-5 text-primary-light" />
                   </div>

@@ -167,7 +167,7 @@ export default function VerifyPage() {
               className={`relative border-2 border-dashed rounded-[2.5rem] p-20 flex flex-col items-center justify-center gap-4 transition-all cursor-pointer group ${
                 isDragActive
                   ? "border-primary bg-primary/5 scale-[1.02]"
-                  : "border-white/10 hover:border-primary/30 hover:bg-white/[0.02]"
+                  : "border-card-border hover:border-primary hover:bg-white/[0.02]"
               }`}
             >
               <input
@@ -191,7 +191,7 @@ export default function VerifyPage() {
               </div>
             </div>
           ) : (
-            <div className="glass p-6 rounded-3xl border-white/10 flex items-center justify-between group">
+            <div className="glass p-6 rounded-3xl flex items-center justify-between group">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center">
                   {file.type === "application/pdf" ? (
@@ -231,7 +231,7 @@ export default function VerifyPage() {
             type="button"
             onClick={() => setStep(2)}
             disabled={!file}
-            className="w-full bg-primary hover:bg-primary-light disabled:bg-primary/50 text-white font-bold py-5 rounded-[2rem] shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+            className="w-full bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-white font-bold py-5 rounded-[2rem] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
           >
             Continue <ArrowRight className="w-5 h-5" />
           </button>
@@ -250,8 +250,8 @@ export default function VerifyPage() {
             </p>
           </div>
 
-          <div className="glass p-8 rounded-[2.5rem] border-white/10 space-y-6">
-            <div className="flex items-center justify-between pb-6 border-b border-white/5">
+          <div className="glass p-8 rounded-[2.5rem] space-y-6">
+            <div className="flex items-center justify-between pb-6 border-b border-card-border">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
                   <FileText className="w-5 h-5 text-foreground/40" />
@@ -293,7 +293,7 @@ export default function VerifyPage() {
               <button
                 type="button"
                 onClick={() => setShowBuyCredits(true)}
-                className="w-full bg-primary hover:bg-primary-light text-white font-bold py-5 rounded-[2rem] shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+                className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-5 rounded-[2rem] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
               >
                 <Coins className="w-5 h-5" /> Buy Credits
               </button>
@@ -302,7 +302,7 @@ export default function VerifyPage() {
                 type="button"
                 onClick={startVerification}
                 disabled={isProcessing}
-                className="w-full bg-primary hover:bg-primary-light disabled:bg-primary/50 text-white font-bold py-5 rounded-[2rem] shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+                className="w-full bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-white font-bold py-5 rounded-[2rem] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
               >
                 {isProcessing ? (
                   <>
@@ -411,12 +411,12 @@ export default function VerifyPage() {
       {step === 4 && result && verificationId && (
         <div className="space-y-10 reveal active">
           <div
-            className={`p-10 rounded-[3rem] border transition-all duration-700 shadow-2xl ${
+            className={`p-10 rounded-[3rem] border transition-all duration-700 ${
               result.verdict === "AUTHENTIC"
-                ? "bg-green-500/10 border-green-500/20 shadow-green-500/5"
+                ? "bg-[#052e16] border-[#16A34A]"
                 : result.verdict === "SUSPICIOUS"
-                ? "bg-amber-500/10 border-amber-500/20 shadow-amber-500/5"
-                : "bg-red-500/10 border-red-500/20 shadow-red-500/5"
+                ? "bg-[#431407] border-[#D97706]"
+                : "bg-[#450a0a] border-[#DC2626]"
             }`}
           >
             <div className="flex flex-col items-center text-center space-y-6">
@@ -444,10 +444,10 @@ export default function VerifyPage() {
                 <h2
                   className={`text-5xl font-heading font-black mb-2 ${
                     result.verdict === "AUTHENTIC"
-                      ? "text-green-500"
+                      ? "text-[#16A34A]"
                       : result.verdict === "SUSPICIOUS"
-                      ? "text-amber-500"
-                      : "text-red-500"
+                      ? "text-[#D97706]"
+                      : "text-[#DC2626]"
                   }`}
                 >
                   {result.verdict}
@@ -468,12 +468,12 @@ export default function VerifyPage() {
                 </p>
               )}
 
-              <div className="w-full h-px bg-white/5 my-4" />
+              <div className="w-full h-px bg-card-border my-4" />
 
               <div className="w-full space-y-4">
                 <Link
                   href={`/verify/${verificationId}`}
-                  className="w-full bg-primary hover:bg-primary-light text-white font-bold py-5 rounded-[2rem] shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+                  className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-5 rounded-[2rem] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
                 >
                   View Full Report <ArrowRight className="w-5 h-5" />
                 </Link>

@@ -73,7 +73,7 @@ export default function VerificationResultPage() {
   if (data.status !== "complete" || !data.verdict) {
     return (
       <div className="max-w-[760px] mx-auto p-6 md:p-10 lg:pt-20">
-        <div className="glass p-12 rounded-[3rem] border-white/5 text-center space-y-6">
+        <div className="glass p-12 rounded-[3rem] text-center space-y-6">
           {data.status === "error" ? (
             <>
               <div className="w-16 h-16 rounded-3xl bg-red-500/10 flex items-center justify-center text-red-500 mx-auto">
@@ -174,7 +174,7 @@ export default function VerificationResultPage() {
     <div className="max-w-[760px] mx-auto p-6 md:p-10 lg:pt-20 space-y-8 pb-32 lg:pb-20">
       {/* Verdict Banner */}
       <div
-        className={`w-full p-8 md:p-10 rounded-[3rem] border ${config.bg} ${config.border} shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 reveal active`}
+        className={`w-full p-8 md:p-10 rounded-[3rem] border ${config.bg} ${config.border} flex flex-col md:flex-row items-center justify-between gap-8 reveal active`}
       >
         <div className="flex items-center gap-6">
           <div className={`p-4 rounded-3xl bg-white/10 ${config.text}`}>
@@ -221,7 +221,7 @@ export default function VerificationResultPage() {
 
       {/* AI Summary Card */}
       <div
-        className="glass p-8 rounded-[2.5rem] border-white/5 space-y-4 reveal active"
+        className="glass p-8 rounded-[2.5rem] space-y-4 reveal active"
         style={{ transitionDelay: "100ms" }}
       >
         <div className="flex items-center justify-between">
@@ -239,7 +239,7 @@ export default function VerificationResultPage() {
           <FileText className="w-4 h-4" />
           {data.documentName}
         </div>
-        <p className="text-[11px] font-medium text-foreground/30 leading-relaxed pt-2 border-t border-white/5">
+        <p className="text-[11px] font-medium text-foreground/30 leading-relaxed pt-2 border-t border-card-border">
           This is an AI screening result, not a legal confirmation. For
           high-stakes decisions, confirm directly with the issuing school or
           ministry.
@@ -252,7 +252,7 @@ export default function VerificationResultPage() {
         style={{ transitionDelay: "200ms" }}
       >
         {/* Flags */}
-        <div className="glass p-8 rounded-[2.5rem] border-white/5 space-y-6">
+        <div className="glass p-8 rounded-[2.5rem] space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <ShieldAlert className="w-5 h-5 text-red-500" />
             <h3 className="text-xl font-heading font-bold">Issues Found</h3>
@@ -280,7 +280,7 @@ export default function VerificationResultPage() {
         </div>
 
         {/* Passed Checks */}
-        <div className="glass p-8 rounded-[2.5rem] border-white/5 space-y-6">
+        <div className="glass p-8 rounded-[2.5rem] space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <ShieldCheck className="w-5 h-5 text-green-500" />
             <h3 className="text-xl font-heading font-bold">Passed Checks</h3>
@@ -310,7 +310,7 @@ export default function VerificationResultPage() {
       {/* Issuer Contact Hints */}
       {hints && hints.included && (
         <div
-          className="glass p-8 rounded-[2.5rem] border-amber-500/20 bg-amber-500/[0.02] space-y-6 reveal active"
+          className="glass p-8 rounded-[2.5rem] space-y-6 reveal active"
           style={{ transitionDelay: "250ms" }}
         >
           <div className="flex items-center gap-3">
@@ -407,7 +407,7 @@ export default function VerificationResultPage() {
 
       {/* Verification Details */}
       <div
-        className="glass p-8 rounded-[2.5rem] border-white/5 reveal active"
+        className="glass p-8 rounded-[2.5rem] reveal active"
         style={{ transitionDelay: "300ms" }}
       >
         <h3 className="text-xl font-heading font-bold mb-8">
@@ -447,7 +447,7 @@ export default function VerificationResultPage() {
 
       {/* Action Bar */}
       <div
-        className="fixed bottom-0 left-0 right-0 lg:static bg-dark-bg/80 backdrop-blur-xl lg:bg-transparent border-t lg:border-none border-white/5 p-6 lg:p-0 flex flex-col md:flex-row items-center justify-between gap-4 z-40 reveal active"
+        className="fixed bottom-0 left-0 right-0 lg:static bg-dark-bg lg:bg-transparent border-t lg:border-none border-card-border p-6 lg:p-0 flex flex-col md:flex-row items-center justify-between gap-4 z-40 reveal active"
         style={{ transitionDelay: "400ms" }}
       >
         <Link
@@ -461,7 +461,7 @@ export default function VerificationResultPage() {
           <button
             type="button"
             onClick={() => window.print()}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-primary hover:bg-primary-light text-white px-8 py-4 rounded-2xl font-bold transition-all hover:scale-[1.02] shadow-xl shadow-primary/20"
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white px-8 py-4 rounded-2xl font-bold transition-all hover:scale-[1.02]"
           >
             <Download className="w-5 h-5" />
             Download Report

@@ -106,10 +106,10 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
       <div
-        className="absolute inset-0 bg-dark-bg/80 backdrop-blur-md"
+        className="absolute inset-0 bg-dark-bg/80"
         onClick={handleClose}
       />
-      <div className="relative w-full max-w-md glass p-8 md:p-10 rounded-[3rem] border-white/10 shadow-2xl space-y-6">
+      <div className="relative w-full max-w-md glass p-8 md:p-10 rounded-[3rem] shadow-sharp space-y-6">
         <button
           onClick={handleClose}
           className="absolute right-8 top-8 p-2 rounded-lg hover:bg-white/5 text-foreground/20 hover:text-white transition-all"
@@ -135,8 +135,8 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
                     onClick={() => setSelected(pack.credits)}
                     className={`p-4 rounded-2xl border text-left transition-all ${
                       isActive
-                        ? "bg-primary/10 border-primary/50 ring-2 ring-primary/20"
-                        : "bg-white/5 border-white/10 hover:border-white/20"
+                        ? "bg-primary/10 border-primary"
+                        : "bg-card border-card-border hover:border-primary"
                     }`}
                   >
                     <p className="text-2xl font-heading font-black text-white">
@@ -163,7 +163,7 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
             <button
               onClick={startPurchase}
               disabled={selected == null || isInitiating}
-              className="w-full bg-primary hover:bg-primary-light disabled:bg-primary/40 text-white font-bold py-4 rounded-2xl shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+              className="w-full bg-primary hover:bg-primary-hover disabled:bg-primary/40 text-white font-bold py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
             >
               {isInitiating ? (
                 <>
@@ -214,7 +214,7 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
             </div>
             <button
               onClick={handleClose}
-              className="w-full bg-primary hover:bg-primary-light text-white font-bold py-4 rounded-2xl transition-all"
+              className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 rounded-2xl transition-all"
             >
               Done
             </button>
@@ -236,7 +236,7 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
             </div>
             <button
               onClick={() => setPhase("select")}
-              className="w-full bg-primary hover:bg-primary-light text-white font-bold py-4 rounded-2xl transition-all"
+              className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 rounded-2xl transition-all"
             >
               Try again
             </button>

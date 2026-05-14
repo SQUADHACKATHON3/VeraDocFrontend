@@ -63,11 +63,11 @@ export default function DashboardPage() {
   const getVerdictStyles = (verdict: string) => {
     switch (verdict) {
       case "AUTHENTIC":
-        return "bg-green-500/10 text-green-500 border-green-500/20";
+        return "bg-[#052e16] text-[#16A34A] border-[#16A34A]";
       case "SUSPICIOUS":
-        return "bg-amber-500/10 text-amber-500 border-amber-500/20";
+        return "bg-[#431407] text-[#D97706] border-[#D97706]";
       case "FAKE":
-        return "bg-red-500/10 text-red-500 border-red-500/20";
+        return "bg-[#450a0a] text-[#DC2626] border-[#DC2626]";
       default:
         return "bg-gray-500/10 text-gray-500 border-gray-500/20";
     }
@@ -96,7 +96,7 @@ export default function DashboardPage() {
           { label: "Authentic Results", value: stats.authentic, icon: ShieldCheck, color: "text-green-500" },
           { label: "Flagged Results", value: stats.flagged, icon: ShieldAlert, color: "text-red-500" },
         ].map((stat, i) => (
-          <div key={i} className="glass group p-6 rounded-3xl border-white/5 hover:border-primary/30 transition-all duration-500 hover:shadow-[0_0_30px_rgba(37,99,235,0.1)] reveal active" style={{ transitionDelay: `${i * 100}ms` }}>
+          <div key={i} className="glass glass-hover group p-6 rounded-3xl transition-all duration-500 reveal active" style={{ transitionDelay: `${i * 100}ms` }}>
             <div className="flex justify-between items-start mb-4">
               <div className={`p-3 rounded-2xl bg-white/5 ${stat.color}`}>
                 <stat.icon className="w-6 h-6" />
@@ -114,12 +114,12 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Action Banner */}
-      <div className="glass bg-gradient-to-r from-primary/10 to-transparent border-white/5 border-l-4 border-l-primary p-8 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 reveal active">
+      <div className="bg-card border-l-4 border-primary p-8 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 reveal active">
         <div className="text-center md:text-left">
           <h3 className="text-xl font-heading font-bold mb-2 text-white">Ready to verify a document?</h3>
           <p className="text-foreground/50 font-medium">Upload and get results in under 10 seconds.</p>
         </div>
-        <Link href="/verify" className="bg-primary hover:bg-primary-light text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-2 transition-all hover:scale-[1.02] shadow-xl shadow-primary/20">
+        <Link href="/verify" className="bg-primary hover:bg-primary-hover text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-2 transition-all hover:scale-[1.02]">
           New Verification <ArrowRight className="w-5 h-5" />
         </Link>
       </div>
@@ -133,7 +133,7 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        <div className="glass rounded-[2rem] border-white/5 overflow-hidden">
+        <div className="glass rounded-[2rem] overflow-hidden">
           {isLoading ? (
             <div className="p-8 space-y-4">
               {[1, 2, 3].map((i) => (
@@ -179,7 +179,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="p-20 text-center flex flex-col items-center justify-center space-y-6">
-              <div className="w-20 h-20 rounded-3xl bg-white/5 flex items-center justify-center border border-white/10">
+              <div className="w-20 h-20 rounded-3xl bg-card flex items-center justify-center border border-card-border">
                 <Shield className="w-10 h-10 text-foreground/20" />
               </div>
               <div className="space-y-2">

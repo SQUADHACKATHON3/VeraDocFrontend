@@ -44,11 +44,8 @@ export default function LandingPage() {
 
       <main>
         {/* Hero Section */}
-        <section className="relative pt-24 pb-16 md:pt-36 md:pb-24 overflow-hidden">
+        <section className="relative pt-24 pb-16 md:pt-36 md:pb-24 overflow-hidden bg-dark-bg">
 
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-dots pointer-events-none opacity-40"></div>
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-glow-radial pointer-events-none"></div>
-          
           <div className="container mx-auto px-6 relative z-10">
             <div className="flex flex-col lg:flex-row items-center gap-16">
               <div className="lg:w-3/5 text-center lg:text-left">
@@ -71,10 +68,10 @@ export default function LandingPage() {
                 </p>
                 
                 <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 reveal" style={{ transitionDelay: "400ms" }}>
-                  <Link href="/auth/register" className="w-full sm:w-auto bg-primary hover:bg-primary-light text-white px-8 py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2 transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(37,99,235,0.4)]">
+                  <Link href="/auth/register" className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-white px-8 py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2 transition-all hover:scale-105">
                     Start Verifying <ArrowRight className="w-5 h-5" />
                   </Link>
-                  <Link href="#how-it-works" className="w-full sm:w-auto glass hover:bg-white/10 px-8 py-4 rounded-full font-bold text-lg transition-all text-center">
+                  <Link href="#how-it-works" className="w-full sm:w-auto bg-transparent border border-card-border text-white hover:border-primary hover:text-primary px-8 py-4 rounded-full font-bold text-lg transition-all text-center">
                     See How It Works
                   </Link>
                 </div>
@@ -83,11 +80,8 @@ export default function LandingPage() {
               {/* Minimal Surgical UI Element */}
               <div className="lg:w-2/5 flex justify-center lg:justify-end reveal" style={{ transitionDelay: "600ms" }}>
                 <div className="relative w-[280px] group">
-                  {/* Glow effect */}
-                  <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full opacity-50 group-hover:opacity-70 transition-opacity"></div>
-                  
-                  {/* Glass Card */}
-                  <div className="relative glass rounded-3xl p-8 border-white/10 shadow-[0_20px_50px_rgba(8,11,20,0.5),0_0_30px_rgba(37,99,235,0.1)] -rotate-3 hover:rotate-0 transition-all duration-700 ease-out">
+                  {/* Card */}
+                  <div className="relative glass rounded-3xl p-8 -rotate-3 hover:rotate-0 transition-all duration-700 ease-out">
                     <div className="flex flex-col items-center text-center">
                       <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
                         <Shield className="w-7 h-7 text-primary-light" />
@@ -96,7 +90,7 @@ export default function LandingPage() {
                       <div className="text-[10px] font-bold tracking-[0.3em] text-primary-light uppercase mb-2">Verified</div>
                       <div className="text-5xl font-heading font-black text-white mb-6 tracking-tighter">98.4%</div>
                       
-                      <div className="w-full h-px bg-white/10 mb-6"></div>
+                      <div className="w-full h-px bg-card-border mb-6"></div>
                       
                       <div className="w-full space-y-4 text-left font-sans">
                         <div className="flex items-center gap-3 text-[11px] text-foreground/70 font-medium">
@@ -122,7 +116,7 @@ export default function LandingPage() {
         </section>
 
         {/* Problem Section */}
-        <section className="py-16 bg-dark-bg relative">
+        <section className="py-16 bg-sidebar relative">
           <div className="container mx-auto px-6">
             <div className="max-w-3xl mx-auto text-center mb-16 reveal">
               <h2 className="text-3xl md:text-5xl font-heading font-bold mb-6">
@@ -154,8 +148,7 @@ export default function LandingPage() {
         </section>
 
         {/* How It Works Section */}
-        <section id="how-it-works" className="py-16 relative overflow-hidden">
-          <div className="absolute inset-0 bg-primary/5 -skew-y-3 origin-right"></div>
+        <section id="how-it-works" className="py-16 relative overflow-hidden bg-dark-bg">
           <div className="container mx-auto px-6 relative z-10">
             <div className="text-center mb-20 reveal">
               <h2 className="text-4xl md:text-5xl font-heading font-bold mb-4">Three steps. Seconds, not days.</h2>
@@ -163,7 +156,7 @@ export default function LandingPage() {
 
             <div className="relative">
               {/* Connecting Line (Desktop) */}
-              <div className="hidden lg:block absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent -translate-y-1/2"></div>
+              <div className="hidden lg:block absolute top-1/2 left-0 w-full h-0.5 bg-card-border -translate-y-1/2"></div>
               
               <div className="grid lg:grid-cols-3 gap-12 lg:gap-8">
                 {[
@@ -172,8 +165,8 @@ export default function LandingPage() {
                   { step: "03", title: "Verify", text: "Receive an AI trust score, verdict, and detailed forensic breakdown.", icon: <Shield className="w-8 h-8" /> }
                 ].map((item, i) => (
                   <div key={i} className="relative flex flex-col items-center text-center reveal" style={{ transitionDelay: `${i * 200}ms` }}>
-                    <div className="w-20 h-20 rounded-2xl bg-dark-bg border border-white/10 flex items-center justify-center mb-8 relative z-10 group-hover:border-primary transition-colors">
-                      <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-xs font-bold shadow-lg">
+                    <div className="w-20 h-20 rounded-2xl bg-card border border-card-border flex items-center justify-center mb-8 relative z-10 group-hover:border-primary transition-colors">
+                      <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-xs font-bold">
                         {item.step}
                       </div>
                       <div className="text-primary-light">{item.icon}</div>
@@ -210,7 +203,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/auth/register" className="w-full py-4 rounded-xl glass hover:bg-white/10 font-bold text-center transition-all">
+                <Link href="/auth/register" className="w-full py-4 rounded-xl bg-transparent border border-card-border text-white hover:border-primary hover:text-primary font-bold text-center transition-all">
                   Get Started
                 </Link>
               </div>
@@ -220,8 +213,7 @@ export default function LandingPage() {
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary px-4 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase z-10">
                   Best Value
                 </div>
-                <div className="glass bg-white/5 border-primary/50 p-10 rounded-3xl flex flex-col h-full glow-blue relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl -mr-16 -mt-16"></div>
+                <div className="bg-card border border-primary p-10 rounded-3xl flex flex-col h-full relative overflow-hidden">
                   <h3 className="text-xl font-heading font-bold mb-2">20-Credit Pack</h3>
                   <div className="flex items-baseline gap-1 mb-6">
                     <span className="text-4xl font-heading font-bold">₦14,000</span>
@@ -234,7 +226,7 @@ export default function LandingPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link href="/auth/register" className="w-full py-4 rounded-xl bg-primary hover:bg-primary-light text-white font-bold text-center transition-all shadow-lg shadow-primary/20">
+                  <Link href="/auth/register" className="w-full py-4 rounded-xl bg-primary hover:bg-primary-hover text-white font-bold text-center transition-all">
                     Get Started
                   </Link>
                 </div>
@@ -246,8 +238,7 @@ export default function LandingPage() {
         {/* CTA Banner */}
         <section className="py-16 px-6">
           <div className="container mx-auto">
-            <div className="glass bg-gradient-to-br from-primary/20 to-transparent border-primary/20 rounded-[40px] p-12 md:p-20 text-center relative overflow-hidden reveal">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-glow-radial opacity-50"></div>
+            <div className="bg-card border-l-4 border-primary rounded-[40px] p-12 md:p-20 text-center relative overflow-hidden reveal">
               <div className="relative z-10">
                 <h2 className="text-4xl md:text-6xl font-heading font-black mb-6 leading-tight">
                   Your next bad hire could <br /> cost you everything.
@@ -255,7 +246,7 @@ export default function LandingPage() {
                 <p className="text-xl text-foreground/60 mb-10 max-w-xl mx-auto">
                   Join the institutions already verifying smarter with Nigeria's most advanced AI document forensics.
                 </p>
-                <Link href="/auth/register" className="inline-flex bg-white text-dark-bg hover:scale-105 transition-transform px-10 py-5 rounded-full font-bold text-lg shadow-2xl">
+                <Link href="/auth/register" className="inline-flex bg-white text-dark-bg hover:scale-105 transition-transform px-10 py-5 rounded-full font-bold text-lg">
                   Start Verifying for Free
                 </Link>
               </div>
@@ -265,7 +256,7 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="pt-16 pb-10 border-t border-white/5">
+      <footer className="pt-16 pb-10 border-t border-card-border">
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-12 mb-20">
             <div className="col-span-2">
@@ -298,7 +289,7 @@ export default function LandingPage() {
             </div>
           </div>
           
-          <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-foreground/30 font-medium">
+          <div className="pt-10 border-t border-card-border flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-foreground/30 font-medium">
             <p>© 2026 VeraDoc. Built for Squad Hackathon 3.0</p>
             <p>Built by The Dev Team, OAU Ile-Ife.</p>
           </div>

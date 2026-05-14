@@ -3,72 +3,53 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-outfit);
-  --font-heading: var(--font-playfair);
-  
+  --font-sans: var(--font-poppins);
+  --font-heading: var(--font-poppins);
+
   --color-primary: #2563EB;
   --color-primary-light: #3B82F6;
+  --color-primary-hover: #1D4ED8;
   --color-dark-bg: #080B14;
+
+  /* Flat dark surfaces */
+  --color-card: #0F1623;
+  --color-card-border: #1E2A3A;
+  --color-sidebar: #0A0F1A;
 }
 
 :root {
   --background: #080B14;
   --foreground: #F8FAFC;
-  
-  --font-playfair: "Playfair Display", serif;
-  --font-outfit: "Outfit", sans-serif;
 
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-blur: 16px;
+  --font-poppins: "Poppins", sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-poppins), sans-serif;
   overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-playfair), serif;
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 700;
 }
 
 
-/* Glassmorphism Utility */
+/* Flat card surface (formerly glassmorphism) */
 .glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--glass-border);
+  background: #0F1623;
+  border: 1px solid #1E2A3A;
 }
 
 .glass-hover:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(37, 99, 235, 0.3);
-  box-shadow: 0 0 20px rgba(37, 99, 235, 0.1);
+  border-color: #2563EB;
 }
 
-/* Background Patterns */
-.bg-grid {
-  background-size: 40px 40px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-}
-
-.bg-dots {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
-/* Glow Effects */
-.glow-blue {
-  box-shadow: 0 0 50px -10px rgba(37, 99, 235, 0.3);
-}
-
-.bg-glow-radial {
-  background: radial-gradient(circle at center, rgba(37, 99, 235, 0.15) 0%, transparent 70%);
+/* Single sharp shadow — used only where elevation is needed */
+.shadow-sharp {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 /* Custom Animations */
@@ -113,7 +94,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1E293B;
+  background: #1E2A3A;
   border-radius: 4px;
 }
 

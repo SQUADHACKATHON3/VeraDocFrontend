@@ -51,7 +51,7 @@ export default function LoginPage() {
       <main className="flex flex-col lg:flex-row min-h-screen">
         {/* Left Column: Login Form */}
         <div className="w-full lg:w-[45%] xl:w-[40%] flex items-center justify-center p-6 md:p-12 pt-40 lg:pt-32 relative z-10">
-          <div className="w-full max-w-md glass p-8 md:p-10 rounded-[2.5rem] border-white/10 shadow-2xl reveal active">
+          <div className="w-full max-w-md glass p-8 md:p-10 rounded-[2.5rem] reveal active">
             <div className="mb-10">
               <h1 className="text-3xl md:text-4xl font-heading font-black mb-3 tracking-tight">Welcome back.</h1>
               <p className="text-foreground/50 font-medium">Sign in to continue verifying.</p>
@@ -70,7 +70,7 @@ export default function LoginPage() {
                     }
                   })}
                   disabled={isLoading}
-                  className={`w-full bg-white/5 border ${errors.email ? 'border-red-500/50' : 'border-white/10'} focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-2xl px-5 py-4 outline-none transition-all font-medium placeholder:text-white/10`}
+                  className={`w-full bg-card border ${errors.email ? 'border-red-500' : 'border-card-border'} focus:border-primary rounded-2xl px-5 py-4 outline-none transition-all font-medium placeholder:text-white/10`}
                   placeholder="name@institution.edu.ng"
                 />
                 {errors.email && <p className="text-red-500 text-xs mt-1 ml-1 font-medium">{errors.email.message}</p>}
@@ -87,7 +87,7 @@ export default function LoginPage() {
                     {...register("password", { required: "Password is required" })}
                     type={showPassword ? "text" : "password"}
                     disabled={isLoading}
-                    className={`w-full bg-white/5 border ${errors.password ? 'border-red-500/50' : 'border-white/10'} focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-2xl px-5 py-4 outline-none transition-all font-medium placeholder:text-white/10`}
+                    className={`w-full bg-card border ${errors.password ? 'border-red-500' : 'border-card-border'} focus:border-primary rounded-2xl px-5 py-4 outline-none transition-all font-medium placeholder:text-white/10`}
                     placeholder="••••••••"
                   />
                   <button
@@ -110,7 +110,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-primary hover:bg-primary-light disabled:bg-primary/50 text-white font-bold py-4 rounded-2xl shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 group mt-2"
+                className="w-full bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-white font-bold py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 group mt-2"
               >
                 {isLoading ? (
                   <>
@@ -133,10 +133,7 @@ export default function LoginPage() {
         </div>
 
         {/* Right Column: Branding */}
-        <div className="hidden lg:flex lg:w-[55%] xl:w-[60%] bg-[#0A0E1A] relative items-center justify-center overflow-hidden border-l border-white/5 pt-32 lg:pt-20">
-          <div className="absolute inset-0 bg-dots opacity-20"></div>
-          <div className="absolute inset-0 bg-glow-radial opacity-30"></div>
-          
+        <div className="hidden lg:flex lg:w-[55%] xl:w-[60%] bg-sidebar relative items-center justify-center overflow-hidden border-l border-card-border pt-32 lg:pt-20">
           <div className="relative z-10 p-12 xl:p-20 max-w-2xl text-center">
             <h2 className="text-3xl xl:text-4xl font-heading font-black leading-tight text-white mb-8">
               "One fake certificate. <br />
@@ -149,7 +146,7 @@ export default function LoginPage() {
 
             <div className="space-y-4 relative max-w-sm mx-auto">
               {/* Floating Stat Cards */}
-              <div className="glass p-4 rounded-2xl border-white/10 flex items-center gap-4 -rotate-1 hover:rotate-0 transition-transform duration-500">
+              <div className="glass p-4 rounded-2xl flex items-center gap-4 -rotate-1 hover:rotate-0 transition-transform duration-500">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                    <Shield className="w-5 h-5 text-primary" />
                 </div>
@@ -159,7 +156,7 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <div className="glass p-4 rounded-2xl border-white/10 flex items-center gap-4 rotate-1 translate-x-8 hover:rotate-0 hover:translate-x-0 transition-transform duration-500 shadow-2xl">
+              <div className="glass p-4 rounded-2xl flex items-center gap-4 rotate-1 translate-x-8 hover:rotate-0 hover:translate-x-0 transition-transform duration-500">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                    <Shield className="w-5 h-5 text-primary" />
                 </div>
@@ -169,7 +166,7 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <div className="glass p-4 rounded-2xl border-white/10 flex items-center gap-4 -rotate-1 hover:rotate-0 transition-transform duration-500">
+              <div className="glass p-4 rounded-2xl flex items-center gap-4 -rotate-1 hover:rotate-0 transition-transform duration-500">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                    <Shield className="w-5 h-5 text-primary" />
                 </div>

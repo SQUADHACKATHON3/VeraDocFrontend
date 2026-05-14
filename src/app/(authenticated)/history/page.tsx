@@ -101,9 +101,9 @@ function HistoryContent() {
 
   const getVerdictStyles = (verdict: string) => {
     switch (verdict) {
-      case "AUTHENTIC": return "bg-green-500/10 text-green-500 border-green-500/20";
-      case "SUSPICIOUS": return "bg-amber-500/10 text-amber-500 border-amber-500/20";
-      case "FAKE": return "bg-red-500/10 text-red-500 border-red-500/20";
+      case "AUTHENTIC": return "bg-[#052e16] text-[#16A34A] border-[#16A34A]";
+      case "SUSPICIOUS": return "bg-[#431407] text-[#D97706] border-[#D97706]";
+      case "FAKE": return "bg-[#450a0a] text-[#DC2626] border-[#DC2626]";
       default: return "bg-white/5 text-foreground/40 border-white/10";
     }
   };
@@ -122,7 +122,7 @@ function HistoryContent() {
           <h1 className="text-4xl font-heading font-black mb-2">Verification History</h1>
           <p className="text-foreground/50 font-medium">All documents you have submitted for verification.</p>
         </div>
-        <Link href="/verify" className="bg-primary hover:bg-primary-light text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-2 transition-all hover:scale-[1.02] shadow-xl shadow-primary/20 w-full md:w-auto justify-center">
+        <Link href="/verify" className="bg-primary hover:bg-primary-hover text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-2 transition-all hover:scale-[1.02] w-full md:w-auto justify-center">
           New Verification <ArrowRight className="w-5 h-5" />
         </Link>
       </header>
@@ -136,17 +136,17 @@ function HistoryContent() {
             placeholder="Search by document name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white/5 border border-white/5 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-2xl pl-12 pr-6 py-4 outline-none transition-all font-medium text-white placeholder:text-white/10"
+            className="w-full bg-card border border-card-border focus:border-primary rounded-2xl pl-12 pr-6 py-4 outline-none transition-all font-medium text-white placeholder:text-white/10"
           />
         </div>
-        <div className="flex items-center gap-2 p-1.5 glass rounded-2xl border-white/5 overflow-x-auto">
+        <div className="flex items-center gap-2 p-1.5 glass rounded-2xl overflow-x-auto">
           {["All", "AUTHENTIC", "SUSPICIOUS", "FAKE"].map((f) => (
             <button
               key={f}
               onClick={() => handleFilterChange(f)}
               className={`px-6 py-2.5 rounded-xl text-xs font-black tracking-widest transition-all whitespace-nowrap ${
-                filter === f 
-                  ? "bg-primary text-white shadow-lg shadow-primary/20" 
+                filter === f
+                  ? "bg-primary text-white"
                   : "text-foreground/40 hover:text-white hover:bg-white/5"
               }`}
             >
@@ -158,7 +158,7 @@ function HistoryContent() {
 
       {/* Results */}
       <div className="space-y-6 reveal active" style={{ transitionDelay: "200ms" }}>
-        <div className="glass rounded-[2.5rem] border-white/5 overflow-hidden">
+        <div className="glass rounded-[2.5rem] overflow-hidden">
           {isLoading ? (
             <div className="p-8 space-y-4">
               {[1, 2, 3, 4, 5].map((i) => (
@@ -254,7 +254,7 @@ function HistoryContent() {
             </>
           ) : (
             <div className="p-20 text-center flex flex-col items-center justify-center space-y-6">
-              <div className="w-20 h-20 rounded-[2rem] bg-white/5 flex items-center justify-center border border-white/10">
+              <div className="w-20 h-20 rounded-[2rem] bg-card flex items-center justify-center border border-card-border">
                 <Shield className="w-10 h-10 text-foreground/20" />
               </div>
               <div className="space-y-2">
