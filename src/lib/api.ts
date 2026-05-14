@@ -381,6 +381,40 @@ export const api = {
   },
 };
 
+/* ------------------------------------------------------------------ */
+/* Pending purchase persistence                                        */
+/* ------------------------------------------------------------------ */
+
+const PENDING_PURCHASE_KEY = "veradoc.pending_purchase";
+
+export type PendingPurchase = {
+  purchaseId: string;
+  credits: number;
+  /** ISO timestamp when the purchase was initiated. */
+  initiatedAt: string;
+};
+
+export const pendingPurchaseStore = {
+  get(): PendingPurchase | null {
+    if (typeof window === "undefined") return null;
+    const raw = localStorage.getItem(PENDING_PURCHASE_KEY);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as PendingPurchase;
+    } catch {
+      return null;
+    }
+  },
+  set(purchase: PendingPurchase) {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(PENDING_PURCHASE_KEY, JSON.stringify(purchase));
+  },
+  clear() {
+    if (typeof window === "undefined") return;
+    localStorage.removeItem(PENDING_PURCHASE_KEY);
+  },
+};
+
 /** Convenience: format a kobo amount as Naira for display. */
 export function formatNaira(amountKobo: number): string {
   return `₦${(amountKobo / 100).toLocaleString("en-NG")}`;

@@ -10,7 +10,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { X, Loader2, CheckCircle2, AlertTriangle, ExternalLink } from "lucide-react";
-import { api, formatNaira, ApiError, type CreditPack } from "@/lib/api";
+import { api, formatNaira, ApiError, pendingPurchaseStore, type CreditPack } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 
 type Props = {
@@ -31,12 +31,52 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
   const [isInitiating, setIsInitiating] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Load the pack catalogue when the modal opens.
+  // Resume polling for a pending purchase that survived a page refresh / tab switch.
+  const resumePendingPurchase = useCallback(
+    (purchaseId: string) => {
+      setPhase("awaiting");
+      pollRef.current = setInterval(async () => {
+        try {
+          const status = await api.getPurchaseStatus(purchaseId);
+          if (status.status === "completed") {
+            stopPolling();
+            pendingPurchaseStore.clear();
+            await refreshUser();
+            setPhase("done");
+            onPurchased?.();
+          } else if (status.status === "failed") {
+            stopPolling();
+            pendingPurchaseStore.clear();
+            setError("Payment failed or was cancelled.");
+            setPhase("error");
+          }
+        } catch {
+          /* transient — keep polling */
+        }
+      }, 3000);
+    },
+    [refreshUser, onPurchased]
+  );
+
+  // Load the pack catalogue when the modal opens, and check for pending purchase.
   useEffect(() => {
     if (!open) return;
-    setPhase("select");
     setError(null);
     setSelected(null);
+
+    // If there's a pending purchase less than 30 minutes old, resume polling.
+    const pending = pendingPurchaseStore.get();
+    if (pending) {
+      const age = Date.now() - new Date(pending.initiatedAt).getTime();
+      if (age < 30 * 60 * 1000) {
+        resumePendingPurchase(pending.purchaseId);
+        return;
+      }
+      // Stale — clear it.
+      pendingPurchaseStore.clear();
+    }
+
+    setPhase("select");
     api
       .getCreditPacks()
       .then((res) => {
@@ -44,7 +84,7 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
         setSelected(res.packs[0]?.credits ?? null);
       })
       .catch(() => setError("Couldn't load credit packs. Try again."));
-  }, [open]);
+  }, [open, resumePendingPurchase]);
 
   // Clear any active poll on close/unmount.
   useEffect(() => {
@@ -71,27 +111,18 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
     setError(null);
     try {
       const res = await api.initiatePurchase(selected);
-      window.open(res.checkoutUrl, "_blank", "noopener,noreferrer");
-      setPhase("awaiting");
 
-      // Poll purchase status until it resolves.
-      pollRef.current = setInterval(async () => {
-        try {
-          const status = await api.getPurchaseStatus(res.purchaseId);
-          if (status.status === "completed") {
-            stopPolling();
-            await refreshUser();
-            setPhase("done");
-            onPurchased?.();
-          } else if (status.status === "failed") {
-            stopPolling();
-            setError("Payment failed or was cancelled.");
-            setPhase("error");
-          }
-        } catch {
-          /* transient — keep polling */
-        }
-      }, 3000);
+      // Persist so the callback page / a refresh can resume polling.
+      pendingPurchaseStore.set({
+        purchaseId: res.purchaseId,
+        credits: res.credits,
+        initiatedAt: new Date().toISOString(),
+      });
+
+      window.open(res.checkoutUrl, "_blank", "noopener,noreferrer");
+
+      // Start polling (reuses the same resilient helper).
+      resumePendingPurchase(res.purchaseId);
     } catch (err) {
       setError(
         err instanceof ApiError ? err.message : "Couldn't start the purchase."
