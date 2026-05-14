@@ -179,6 +179,19 @@ export default function RegisterPage() {
                 </div>
               )}
 
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-white font-bold py-4 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 group mt-2"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Creating account...</span>
+                  </>
+                ) : (
+                  <span>Create Account</span>
+                )}
               </button>
             </form>
 
