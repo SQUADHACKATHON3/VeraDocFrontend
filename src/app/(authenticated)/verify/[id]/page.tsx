@@ -119,23 +119,20 @@ export default function VerificationResultPage() {
     switch (data.verdict) {
       case "AUTHENTIC":
         return {
-          bg: "bg-[#052e16]",
-          border: "border-[#16A34A]",
-          text: "text-[#16A34A]",
+          bg: "#052e16",
+          color: "#16A34A",
           icon: ShieldCheck,
         };
       case "SUSPICIOUS":
         return {
-          bg: "bg-[#431407]",
-          border: "border-[#D97706]",
-          text: "text-[#D97706]",
+          bg: "#1c1000",
+          color: "#D97706",
           icon: ShieldAlert,
         };
       default:
         return {
-          bg: "bg-[#450a0a]",
-          border: "border-[#DC2626]",
-          text: "text-[#DC2626]",
+          bg: "#1a0000",
+          color: "#DC2626",
           icon: ShieldX,
         };
     }
@@ -174,46 +171,38 @@ export default function VerificationResultPage() {
     <div className="max-w-[760px] mx-auto p-6 md:p-10 lg:pt-20 space-y-8 pb-56 lg:pb-20">
       {/* Verdict Banner */}
       <div
-        className={`w-full p-6 sm:p-8 md:p-10 rounded-[2rem] md:rounded-[3rem] border ${config.bg} ${config.border} flex flex-col md:flex-row items-center text-center md:text-left justify-between gap-6 md:gap-8 reveal active`}
+        className="w-full min-h-[80px] flex flex-col md:flex-row items-center justify-between px-6 py-4 md:py-0 border-l-[1px] rounded-lg reveal active"
+        style={{ 
+          backgroundColor: config.bg, 
+          borderColor: config.color,
+          borderLeftWidth: '1px'
+        }}
       >
-        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-          <div className={`p-4 rounded-3xl bg-white/10 ${config.text}`}>
-            <config.icon className="w-12 h-12" />
-          </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.3em] opacity-60 mb-1">
+        <div className="flex items-center gap-4">
+          <config.icon className="w-5 h-5 flex-shrink-0" style={{ color: config.color }} />
+          <div className="flex flex-col">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B7280]">
               VERDICT
-            </p>
-            <h1 className="text-4xl sm:text-5xl font-heading font-black break-words">{data.verdict}</h1>
+            </span>
+            <span 
+              className="text-2xl md:text-[28px] font-bold leading-tight" 
+              style={{ color: config.color }}
+            >
+              {data.verdict}
+            </span>
           </div>
         </div>
 
-        <div className="relative w-24 h-24 flex items-center justify-center">
-          <svg className="w-full h-full -rotate-90">
-            <circle
-              cx="48"
-              cy="48"
-              r="40"
-              fill="transparent"
-              stroke="currentColor"
-              strokeWidth="8"
-              className="text-white/5"
-            />
-            <circle
-              cx="48"
-              cy="48"
-              r="40"
-              fill="transparent"
-              stroke="currentColor"
-              strokeWidth="8"
-              strokeDasharray={251.2}
-              strokeDashoffset={251.2 - (251.2 * trustScore) / 100}
-              className={`${config.text} transition-all duration-1000 ease-out`}
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-2xl font-heading font-black">
-              {trustScore}%
+        <div className="flex items-center gap-4 mt-4 md:mt-0">
+          <div className="flex flex-col items-end">
+            <div className="flex items-baseline gap-1" style={{ color: config.color }}>
+              <span className="text-4xl md:text-[48px] font-extrabold leading-none">
+                {trustScore}
+              </span>
+              <span className="text-xl md:text-[24px] font-bold">%</span>
+            </div>
+            <span className="text-[10px] text-[#6B7280] font-bold uppercase tracking-wide">
+              Trust Score
             </span>
           </div>
         </div>
@@ -221,29 +210,31 @@ export default function VerificationResultPage() {
 
       {/* AI Summary Card */}
       <div
-        className="glass p-8 rounded-[2.5rem] space-y-4 reveal active"
+        className="bg-[#0F1623] border border-[#1E2A3A] rounded-lg reveal active overflow-hidden"
         style={{ transitionDelay: "100ms" }}
       >
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-primary uppercase tracking-[0.3em]">
-            AI Summary
+        <div className="px-6 py-3 flex items-center justify-between border-b border-[#1E2A3A]">
+          <span className="text-[11px] font-semibold text-[#2563EB] uppercase tracking-widest">
+            AI SUMMARY
           </span>
-          <span className="text-xs font-bold text-foreground/20 uppercase tracking-widest">
+          <span className="text-[11px] text-[#6B7280] font-medium">
             {verifiedDate}
           </span>
         </div>
-        <p className="text-lg text-white font-medium leading-relaxed">
-          {data.summary || "No summary available for this verification."}
-        </p>
-        <div className="pt-4 flex items-center gap-3 text-sm font-bold text-foreground/40 italic">
-          <FileText className="w-4 h-4" />
-          {data.documentName}
+        <div className="p-6 space-y-4">
+          <p className="text-[15px] text-white leading-[1.6] font-normal">
+            {data.summary || "No summary available for this verification."}
+          </p>
+          <div className="flex items-center gap-2 text-[12px] text-[#6B7280]">
+            <FileText className="w-3.5 h-3.5" />
+            <span>{data.documentName}</span>
+          </div>
         </div>
-        <p className="text-[11px] font-medium text-foreground/30 leading-relaxed pt-2 border-t border-card-border">
-          This is an AI screening result, not a legal confirmation. For
-          high-stakes decisions, confirm directly with the issuing school or
-          ministry.
-        </p>
+        <div className="px-6 py-3 border-t border-[#1E2A3A]">
+          <p className="text-[11px] text-[#6B7280] italic leading-relaxed">
+            This is an AI screening result, not a legal confirmation. For high-stakes decisions, confirm directly with the issuing school or ministry.
+          </p>
+        </div>
       </div>
 
       {/* Checks Grid */}
