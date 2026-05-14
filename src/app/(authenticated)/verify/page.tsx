@@ -335,7 +335,7 @@ export default function VerifyPage() {
       {step === 3 && (
         <div className="text-center space-y-12 py-10 reveal active">
           <div className="relative inline-block">
-            <div className="w-32 h-32 rounded-full border-4 border-primary/20 border-t-primary animate-spin absolute -inset-2" />
+            <div className="rounded-full border-4 border-primary/20 border-t-primary animate-spin absolute -inset-2" />
             <div className="w-32 h-32 rounded-full bg-primary/10 flex items-center justify-center animate-pulse border-2 border-primary/30">
               <Shield className="w-12 h-12 text-primary" />
             </div>
