@@ -199,7 +199,7 @@ export default function LandingPage() {
               <div className="glass p-10 rounded-3xl flex flex-col reveal" style={{ transitionDelay: "100ms" }}>
                 <h3 className="text-xl font-heading font-bold mb-2">Pay-As-You-Go</h3>
                 <div className="flex items-baseline gap-1 mb-6">
-                  <span className="text-4xl font-heading font-bold">₦1,000</span>
+                  <span className="text-4xl font-heading font-bold">₦700</span>
                   <span className="text-foreground/50 font-sans">/verification</span>
                 </div>
 
@@ -218,17 +218,17 @@ export default function LandingPage() {
               {/* Monthly Plan */}
               <div className="relative reveal" style={{ transitionDelay: "300ms" }}>
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary px-4 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase z-10">
-                  Most Popular
+                  Best Value
                 </div>
                 <div className="glass bg-white/5 border-primary/50 p-10 rounded-3xl flex flex-col h-full glow-blue relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl -mr-16 -mt-16"></div>
-                  <h3 className="text-xl font-heading font-bold mb-2">Monthly Plan</h3>
+                  <h3 className="text-xl font-heading font-bold mb-2">20-Credit Pack</h3>
                   <div className="flex items-baseline gap-1 mb-6">
-                    <span className="text-4xl font-heading font-bold">₦50,000</span>
-                    <span className="text-foreground/50 font-sans">/month</span>
+                    <span className="text-4xl font-heading font-bold">₦14,000</span>
+                    <span className="text-foreground/50 font-sans">/20 verifications</span>
                   </div>
                   <ul className="space-y-4 mb-10 flex-grow">
-                    {[ "Unlimited verifications", "Best for HR teams", "API access", "Priority institution checks", "Team management" ].map((feature, i) => (
+                    {[ "20 document verifications", "Best for HR teams & bulk hiring", "Credits never expire", "Instant AI analysis", "Shareable report links" ].map((feature, i) => (
                       <li key={i} className="flex items-center gap-3 text-foreground/70">
                         <CheckCircle className="w-5 h-5 text-primary-light" /> {feature}
                       </li>
