@@ -8,12 +8,10 @@ import {
   ArrowRight,
   Shield,
   Coins,
-  Plus,
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { api, type VerificationListItem } from "@/lib/api";
-import BuyCreditsModal from "@/components/BuyCreditsModal";
 
 type Stats = {
   total: number;
@@ -22,11 +20,10 @@ type Stats = {
 };
 
 export default function DashboardPage() {
-  const { user, refreshUser } = useAuth();
+  const { user } = useAuth();
   const [verifications, setVerifications] = useState<VerificationListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<Stats>({ total: 0, authentic: 0, flagged: 0 });
-  const [showBuyCredits, setShowBuyCredits] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -117,30 +114,20 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Credits Top-Up Card */}
-      <div className="glass glass-hover p-6 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-6 reveal active">
-        <div className="flex items-center gap-5">
-          <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
-            <Coins className="w-7 h-7 text-primary-light" />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-foreground/40 uppercase tracking-widest mb-0.5">Your Balance</p>
-            <p className="text-3xl font-heading font-black text-white">
-              {user?.credits ?? 0}
-              <span className="text-sm font-bold text-foreground/40 ml-1.5">
-                {user?.credits === 1 ? "credit" : "credits"}
-              </span>
-            </p>
-          </div>
+      {/* Credits Balance Card */}
+      <div className="glass glass-hover p-6 rounded-3xl flex items-center gap-5 reveal active">
+        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+          <Coins className="w-7 h-7 text-primary-light" />
         </div>
-        <button
-          type="button"
-          onClick={() => setShowBuyCredits(true)}
-          className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-white px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
-        >
-          <Plus className="w-5 h-5" />
-          Buy Credits
-        </button>
+        <div>
+          <p className="text-xs font-bold text-foreground/40 uppercase tracking-widest mb-0.5">Your Balance</p>
+          <p className="text-3xl font-heading font-black text-white">
+            {user?.credits ?? 0}
+            <span className="text-sm font-bold text-foreground/40 ml-1.5">
+              {user?.credits === 1 ? "credit" : "credits"}
+            </span>
+          </p>
+        </div>
       </div>
 
       {/* Quick Action Banner */}
@@ -255,13 +242,6 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
-
-      {/* Buy Credits Modal */}
-      <BuyCreditsModal
-        open={showBuyCredits}
-        onClose={() => setShowBuyCredits(false)}
-        onPurchased={() => refreshUser()}
-      />
     </div>
   );
 }
