@@ -1,3 +1,8 @@
+/**
+ * Dashboard Page — /dashboard
+ * Overview of the user's activity, recent verifications, and credit balance.
+ * Auth required: Yes
+ */
 "use client";
 
 import { useEffect, useState } from "react";

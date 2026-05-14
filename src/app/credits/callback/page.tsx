@@ -1,3 +1,8 @@
+/**
+ * Payment Callback Page — /credits/callback
+ * Handles the redirect from the payment gateway and verifies the transaction.
+ * Auth required: Yes
+ */
 "use client";
 
 /**

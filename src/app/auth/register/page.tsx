@@ -1,3 +1,8 @@
+/**
+ * Register Page — /auth/register
+ * Allows new users to create an account and join the VeraDoc platform.
+ * Auth required: No
+ */
 "use client";
 
 import { useState } from "react";

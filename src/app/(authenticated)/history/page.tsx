@@ -1,3 +1,8 @@
+/**
+ * History Page — /history
+ * A list of all past verification requests and their results.
+ * Auth required: Yes
+ */
 "use client";
 
 import { useEffect, useState, useCallback, Suspense } from "react";

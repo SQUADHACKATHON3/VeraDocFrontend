@@ -1,3 +1,8 @@
+/**
+ * Root Layout — /
+ * The main layout wrapper for the entire application, including fonts and global providers.
+ * Auth required: No
+ */
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";

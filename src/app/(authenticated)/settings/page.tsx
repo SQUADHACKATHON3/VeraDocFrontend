@@ -1,3 +1,8 @@
+/**
+ * Settings Page — /settings
+ * Manage account information, change passwords, and delete accounts.
+ * Auth required: Yes
+ */
 "use client";
 
 import { useState } from "react";

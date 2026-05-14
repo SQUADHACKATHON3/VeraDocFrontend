@@ -1,3 +1,8 @@
+/**
+ * Login Page — /auth/login
+ * Allows existing users to authenticate and access their accounts.
+ * Auth required: No
+ */
 "use client";
 
 import { useState } from "react";

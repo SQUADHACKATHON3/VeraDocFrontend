@@ -1,3 +1,8 @@
+/**
+ * Landing Page — /
+ * The public landing page for VeraDoc, showcasing features and benefits.
+ * Auth required: No
+ */
 "use client";
 
 import { useEffect, useState } from "react";

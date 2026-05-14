@@ -1,3 +1,8 @@
+/**
+ * Authenticated Layout — /dashboard, /verify, /history, /settings
+ * Shared layout for protected pages, including the sidebar and navigation.
+ * Auth required: Yes
+ */
 "use client";
 
 import { useEffect, useState } from "react";

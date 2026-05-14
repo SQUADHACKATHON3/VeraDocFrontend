@@ -131,20 +131,25 @@ export type VerificationDetail = {
 const ACCESS_KEY = "veradoc.access_token";
 const REFRESH_KEY = "veradoc.refresh_token";
 
+/** Handles local storage of JWT access and refresh tokens. */
 export const tokenStore = {
+  /** Retrieves the stored access token. */
   getAccess(): string | null {
     if (typeof window === "undefined") return null;
     return localStorage.getItem(ACCESS_KEY);
   },
+  /** Retrieves the stored refresh token. */
   getRefresh(): string | null {
     if (typeof window === "undefined") return null;
     return localStorage.getItem(REFRESH_KEY);
   },
+  /** Stores both access and refresh tokens. */
   set(tokens: Tokens) {
     if (typeof window === "undefined") return;
     localStorage.setItem(ACCESS_KEY, tokens.access_token);
     localStorage.setItem(REFRESH_KEY, tokens.refresh_token);
   },
+  /** Clears all stored tokens from local storage. */
   clear() {
     if (typeof window === "undefined") return;
     localStorage.removeItem(ACCESS_KEY);
@@ -156,6 +161,7 @@ export const tokenStore = {
 /* Errors                                                              */
 /* ------------------------------------------------------------------ */
 
+/** Represents an error returned by the VeraDoc API. */
 export class ApiError extends Error {
   status: number;
   detail: unknown;
@@ -309,6 +315,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 
 export const api = {
   /* --- auth --- */
+  /** Registers a new user. */
   register(input: {
     name: string;
     organisation: string;
@@ -321,6 +328,7 @@ export const api = {
     );
   },
 
+  /** Authenticates a user and returns JWT tokens. */
   login(input: { email: string; password: string }) {
     return request<Tokens>("/api/auth/login", {
       method: "POST",
@@ -329,15 +337,18 @@ export const api = {
     });
   },
 
+  /** Fetches the current user's profile and credit balance. */
   me() {
     return request<Me>("/api/auth/me");
   },
 
   /* --- credits --- */
+  /** Fetches available credit purchase packages. */
   getCreditPacks() {
     return request<CreditPacks>("/api/credits/packs", { auth: false });
   },
 
+  /** Initiates a credit purchase and returns a checkout URL. */
   initiatePurchase(pack: number) {
     return request<CreditPurchaseInitiate>("/api/credits/purchase/initiate", {
       method: "POST",
@@ -345,6 +356,7 @@ export const api = {
     });
   },
 
+  /** Retrieves the status of a specific credit purchase. */
   getPurchaseStatus(purchaseId: string) {
     return request<CreditPurchaseStatus>(
       `/api/credits/purchases/${purchaseId}`
@@ -364,6 +376,7 @@ export const api = {
   },
 
   /* --- verification --- */
+  /** Uploads a document and starts the verification process. */
   initiateVerification(file: File) {
     const formData = new FormData();
     formData.append("file", file);
@@ -373,10 +386,12 @@ export const api = {
     });
   },
 
+  /** Polls for the current status of a verification request. */
   getVerificationStatus(id: string) {
     return request<VerificationStatusOut>(`/api/verify/${id}/status`);
   },
 
+  /** Lists previous verification requests with optional filtering. */
   listVerifications(params: {
     page?: number;
     limit?: number;
@@ -386,11 +401,13 @@ export const api = {
     return request<VerificationList>("/api/verifications", { query: params });
   },
 
+  /** Fetches detailed results for a completed verification. */
   getVerification(id: string) {
     return request<VerificationDetail>(`/api/verifications/${id}`);
   },
 
   /* --- account --- */
+  /** Updates the authenticated user's password. */
   changePassword(input: { currentPassword: string; newPassword: string }) {
     return request<{ message: string }>("/api/user/password", {
       method: "PUT",
@@ -398,6 +415,7 @@ export const api = {
     });
   },
 
+  /** Permanently deletes the authenticated user's account. */
   deleteAccount() {
     return request<{ message: string }>("/api/user", { method: "DELETE" });
   },
@@ -416,7 +434,9 @@ export type PendingPurchase = {
   initiatedAt: string;
 };
 
+/** Manages persistence of pending purchases across sessions. */
 export const pendingPurchaseStore = {
+  /** Retrieves the pending purchase from local storage. */
   get(): PendingPurchase | null {
     if (typeof window === "undefined") return null;
     const raw = localStorage.getItem(PENDING_PURCHASE_KEY);
@@ -427,17 +447,19 @@ export const pendingPurchaseStore = {
       return null;
     }
   },
+  /** Saves a pending purchase to local storage. */
   set(purchase: PendingPurchase) {
     if (typeof window === "undefined") return;
     localStorage.setItem(PENDING_PURCHASE_KEY, JSON.stringify(purchase));
   },
+  /** Clears the pending purchase from local storage. */
   clear() {
     if (typeof window === "undefined") return;
     localStorage.removeItem(PENDING_PURCHASE_KEY);
   },
 };
 
-/** Convenience: format a kobo amount as Naira for display. */
+/** Formats a kobo amount string as Naira (e.g., ₦1,000). */
 export function formatNaira(amountKobo: number): string {
   return `₦${(amountKobo / 100).toLocaleString("en-NG")}`;
 }

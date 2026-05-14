@@ -1,3 +1,8 @@
+/**
+ * Verify Page — /verify
+ * The core verification interface where users upload documents for AI analysis.
+ * Auth required: Yes
+ */
 "use client";
 
 import { useState, useEffect, useRef } from "react";
