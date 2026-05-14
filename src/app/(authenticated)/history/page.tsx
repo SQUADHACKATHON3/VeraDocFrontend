@@ -2,30 +2,19 @@
 
 import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { 
-  FileText, 
-  Search, 
-  ShieldCheck, 
-  ShieldAlert, 
-  ShieldX, 
-  Clock, 
+import {
+  FileText,
+  Search,
   ArrowRight,
   Shield,
   ChevronLeft,
   ChevronRight,
-  Filter,
-  Loader2
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
+import { api, type VerificationListItem } from "@/lib/api";
 
-type Verification = {
-  id: string;
-  documentName: string;
-  date: string;
-  verdict: "AUTHENTIC" | "SUSPICIOUS" | "FAKE";
-  trustScore: number;
-};
+const PAGE_SIZE = 10;
 
 type PaginationData = {
   currentPage: number;
@@ -46,7 +35,7 @@ function HistoryContent() {
   const [filter, setFilter] = useState(initialFilter);
   const [page, setPage] = useState(initialPage);
   
-  const [verifications, setVerifications] = useState<Verification[]>([]);
+  const [verifications, setVerifications] = useState<VerificationListItem[]>([]);
   const [pagination, setPagination] = useState<PaginationData>({ currentPage: 1, totalPages: 1, totalItems: 0 });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -76,20 +65,18 @@ function HistoryContent() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const params = new URLSearchParams();
-        params.set("page", page.toString());
-        params.set("limit", "10");
-        if (filter !== "All") params.set("verdict", filter);
-        if (search) params.set("search", search);
+        const data = await api.listVerifications({
+          page,
+          limit: PAGE_SIZE,
+          verdict: filter !== "All" ? filter : undefined,
+          search: search || undefined,
+        });
 
-        const response = await fetch(`/api/verifications?${params.toString()}`);
-        const data = await response.json();
-        
-        setVerifications(data.items || []);
+        setVerifications(data.data);
         setPagination({
-          currentPage: data.currentPage || 1,
-          totalPages: data.totalPages || 1,
-          totalItems: data.totalItems || 0,
+          currentPage: data.page,
+          totalPages: Math.max(1, Math.ceil(data.total / data.limit)),
+          totalItems: data.total,
         });
       } catch (error) {
         console.error("Failed to fetch history:", error);
@@ -207,24 +194,24 @@ function HistoryContent() {
                         </td>
                         <td className="px-8 py-6">
                           <div className="flex flex-col gap-0.5">
-                            <span className="text-white text-xs font-bold">{new Date(v.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                            <span className="text-[10px] font-bold text-foreground/40 uppercase tracking-wider">{new Date(v.date).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
+                            <span className="text-white text-xs font-bold">{new Date(v.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                            <span className="text-[10px] font-bold text-foreground/40 uppercase tracking-wider">{new Date(v.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
                           </div>
                         </td>
                         <td className="px-8 py-6">
-                          <span className={`px-3 py-1 rounded-full text-[10px] font-black border tracking-wider ${getVerdictStyles(v.verdict)}`}>
-                            {v.verdict}
+                          <span className={`px-3 py-1 rounded-full text-[10px] font-black border tracking-wider ${getVerdictStyles(v.verdict ?? "")}`}>
+                            {v.verdict ?? v.status.toUpperCase()}
                           </span>
                         </td>
                         <td className="px-8 py-6 min-w-[140px]">
                           <div className="space-y-2">
                             <div className="flex justify-between items-baseline">
-                              <span className={`text-sm font-black font-heading ${getScoreColor(v.trustScore).replace('bg-', 'text-')}`}>
-                                {v.trustScore}%
+                              <span className={`text-sm font-black font-heading ${v.trustScore != null ? getScoreColor(v.trustScore).replace('bg-', 'text-') : "text-foreground/30"}`}>
+                                {v.trustScore != null ? `${v.trustScore}%` : "—"}
                               </span>
                             </div>
                             <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                              <div className={`h-full ${getScoreColor(v.trustScore)} transition-all duration-1000`} style={{ width: `${v.trustScore}%` }}></div>
+                              <div className={`h-full ${v.trustScore != null ? getScoreColor(v.trustScore) : "bg-white/10"} transition-all duration-1000`} style={{ width: `${v.trustScore ?? 0}%` }}></div>
                             </div>
                           </div>
                         </td>
@@ -248,14 +235,14 @@ function HistoryContent() {
                         <FileText className="w-5 h-5 text-foreground/40" />
                         <span className="font-bold text-white text-sm">{v.documentName}</span>
                       </div>
-                      <span className={`px-2 py-0.5 rounded-full text-[8px] font-black border tracking-wider ${getVerdictStyles(v.verdict)}`}>
-                        {v.verdict}
+                      <span className={`px-2 py-0.5 rounded-full text-[8px] font-black border tracking-wider ${getVerdictStyles(v.verdict ?? "")}`}>
+                        {v.verdict ?? v.status.toUpperCase()}
                       </span>
                     </div>
                     <div className="flex justify-between items-end">
                       <div className="space-y-1">
-                        <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">{new Date(v.date).toLocaleDateString()}</p>
-                        <p className="text-sm font-black font-heading text-white">{v.trustScore}% Trust</p>
+                        <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">{new Date(v.createdAt).toLocaleDateString()}</p>
+                        <p className="text-sm font-black font-heading text-white">{v.trustScore != null ? `${v.trustScore}% Trust` : "Pending"}</p>
                       </div>
                       <Link href={`/verify/${v.id}`} className="text-xs font-bold text-primary flex items-center gap-1">
                         View Report <ArrowRight className="w-3 h-3" />

@@ -1,21 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { 
-  User, 
-  Building2, 
-  Mail, 
-  Eye, 
-  EyeOff, 
-  ShieldAlert, 
+import {
+  User,
+  Building2,
+  Mail,
+  Eye,
+  EyeOff,
+  ShieldAlert,
   Trash2,
   CheckCircle2,
   Loader2,
-  X
+  X,
+  Coins,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { api, ApiError } from "@/lib/api";
 
 type PasswordForm = {
   currentPassword: string;
@@ -24,8 +25,7 @@ type PasswordForm = {
 };
 
 export default function SettingsPage() {
-  const { data: session } = useSession();
-  const router = useRouter();
+  const { user, logout } = useAuth();
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -49,25 +49,21 @@ export default function SettingsPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/user/password", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+      await api.changePassword({
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
       });
-
-      if (response.status === 401) {
-        setError("Current password is incorrect");
-        setIsLoading(false);
-        return;
-      }
-
-      if (!response.ok) throw new Error("Failed to update password");
-
       setSuccess(true);
       reset();
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
+      if (err instanceof ApiError && err.status === 401) {
+        setError("Current password is incorrect");
+      } else if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -77,9 +73,8 @@ export default function SettingsPage() {
     if (deleteConfirmText !== "DELETE") return;
     setIsLoading(true);
     try {
-      const response = await fetch("/api/user", { method: "DELETE" });
-      if (!response.ok) throw new Error("Failed to delete account");
-      await signOut({ callbackUrl: "/" });
+      await api.deleteAccount();
+      logout();
     } catch (err) {
       alert("Failed to delete account. Please contact support.");
       setIsLoading(false);
@@ -106,7 +101,7 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-0.5">
                 <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">Full Name</p>
-                <p className="font-bold text-white text-lg">{session?.user?.name || "---"}</p>
+                <p className="font-bold text-white text-lg">{user?.name || "---"}</p>
               </div>
             </div>
 
@@ -118,7 +113,7 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-0.5">
                 <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">Organisation</p>
-                <p className="font-bold text-white text-lg">VeraDoc Institutional Admin</p>
+                <p className="font-bold text-white text-lg">{user?.organisation || "---"}</p>
               </div>
             </div>
 
@@ -131,12 +126,26 @@ export default function SettingsPage() {
                 </div>
                 <div className="space-y-0.5">
                   <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">Email Address</p>
-                  <p className="font-bold text-white text-lg">{session?.user?.email || "---"}</p>
+                  <p className="font-bold text-white text-lg">{user?.email || "---"}</p>
                 </div>
               </div>
               <span className="bg-white/5 text-foreground/30 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-white/5 whitespace-nowrap">
                 Cannot be changed
               </span>
+            </div>
+
+            <div className="h-px bg-white/5"></div>
+
+            <div className="flex items-center gap-6">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary-light">
+                <Coins className="w-6 h-6" />
+              </div>
+              <div className="space-y-0.5">
+                <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">Credit Balance</p>
+                <p className="font-bold text-white text-lg">
+                  {user?.credits ?? 0} {user?.credits === 1 ? "credit" : "credits"}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -260,7 +269,7 @@ export default function SettingsPage() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 md:p-10">
           <div className="absolute inset-0 bg-dark-bg/80 backdrop-blur-md" onClick={() => setShowDeleteModal(false)}></div>
           <div className="relative w-full max-w-md glass p-10 rounded-[3rem] border-red-500/30 shadow-2xl space-y-8 reveal active">
-            <button onClick={() => setShowDeleteModal(false)} className="absolute right-8 top-8 p-2 rounded-lg hover:bg-white/5 text-foreground/20 hover:text-white transition-all">
+            <button type="button" aria-label="Close" onClick={() => setShowDeleteModal(false)} className="absolute right-8 top-8 p-2 rounded-lg hover:bg-white/5 text-foreground/20 hover:text-white transition-all">
               <X className="w-5 h-5" />
             </button>
             

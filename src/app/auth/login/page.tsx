@@ -3,10 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Shield, Eye, EyeOff, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import { useAuth } from "@/context/AuthContext";
+import { ApiError } from "@/lib/api";
 
 type LoginForm = {
   email: string;
@@ -18,6 +19,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { login } = useAuth();
 
   const {
     register,
@@ -28,22 +30,16 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
     setError(null);
-    
-    try {
-      const result = await signIn("credentials", {
-        redirect: false,
-        email: data.email,
-        password: data.password,
-      });
 
-      if (result?.error) {
+    try {
+      await login(data.email, data.password);
+      router.push("/dashboard");
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
         setError("Invalid email or password");
       } else {
-        router.push("/dashboard");
+        setError("An unexpected error occurred. Please try again.");
       }
-    } catch (err) {
-      setError("An unexpected error occurred");
-    } finally {
       setIsLoading(false);
     }
   };

@@ -12,7 +12,7 @@
 | Next.js API | Local | `http://localhost:3000/api` |
 | Next.js API | Production | `https://veradoc.vercel.app/api` |
 | FastAPI AI Service | Local | `http://localhost:8000` |
-| FastAPI AI Service | Production | `https://veradoc-ai.onrender.com` |
+| FastAPI AI Service | Production | `https://backend-sf30.onrender.com` |
 
 ---
 

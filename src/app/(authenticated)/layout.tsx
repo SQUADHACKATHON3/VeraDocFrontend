@@ -1,59 +1,58 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { 
-  Shield, 
-  LayoutDashboard, 
-  ShieldCheck, 
-  Clock, 
-  Settings, 
-  LogOut 
+import {
+  Shield,
+  LayoutDashboard,
+  ShieldCheck,
+  Clock,
+  Settings,
+  LogOut,
+  Coins,
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { data: session, status } = useSession();
+  const { user, isLoading, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
-  // Temporarily allowing access without session
-  /*
+  // Route guard — bounce unauthenticated users to login.
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/login");
+    if (!isLoading && !user) {
+      router.replace("/auth/login");
     }
-  }, [status, router]);
+  }, [isLoading, user, router]);
 
-  if (status === "loading") {
+  if (isLoading || !user) {
     return (
       <div className="min-h-screen bg-dark-bg flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
-  if (!session) return null;
-  */
-
-
-  // Actually, I'll use the icons requested: LayoutDashboard, ShieldCheck, Clock, Settings
-  const actualNavItems = [
+  const navItems = [
     { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
     { label: "New Verification", icon: ShieldCheck, href: "/verify" },
     { label: "History", icon: Clock, href: "/history" },
     { label: "Settings", icon: Settings, href: "/settings" },
   ];
 
-  const userInitials = session?.user?.name
-    ? session.user.name.split(" ").map((n: string) => n[0]).join("").toUpperCase()
+  const userInitials = user.name
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
     : "U";
-
 
   return (
     <div className="min-h-screen bg-dark-bg text-foreground font-sans flex flex-col lg:flex-row">
@@ -64,24 +63,50 @@ export default function DashboardLayout({
             <div className="bg-primary p-1.5 rounded-lg">
               <Shield className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-heading font-extrabold tracking-tight">VeraDoc</span>
+            <span className="text-xl font-heading font-extrabold tracking-tight">
+              VeraDoc
+            </span>
+          </Link>
+        </div>
+
+        {/* Credits balance */}
+        <div className="px-4 mb-2">
+          <Link
+            href="/verify"
+            className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-primary/10 border border-primary/20 hover:border-primary/40 transition-all group"
+          >
+            <div className="flex items-center gap-2">
+              <Coins className="w-4 h-4 text-primary-light" />
+              <span className="text-xs font-bold uppercase tracking-wider text-foreground/50">
+                Credits
+              </span>
+            </div>
+            <span className="text-lg font-heading font-black text-white">
+              {user.credits}
+            </span>
           </Link>
         </div>
 
         <nav className="flex-1 px-4 py-4 space-y-2">
-          {actualNavItems.map((item) => {
+          {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.label}
                 href={item.href}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all group ${
-                  isActive 
-                    ? "bg-primary/10 text-primary border-l-4 border-primary" 
+                  isActive
+                    ? "bg-primary/10 text-primary border-l-4 border-primary"
                     : "hover:bg-white/5 text-foreground/60 hover:text-white"
                 }`}
               >
-                <item.icon className={`w-5 h-5 ${isActive ? "text-primary" : "text-foreground/40 group-hover:text-white"}`} />
+                <item.icon
+                  className={`w-5 h-5 ${
+                    isActive
+                      ? "text-primary"
+                      : "text-foreground/40 group-hover:text-white"
+                  }`}
+                />
                 {item.label}
               </Link>
             );
@@ -94,15 +119,17 @@ export default function DashboardLayout({
               {userInitials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold truncate text-white">{session?.user?.name || "Guest User"}</p>
+              <p className="text-sm font-bold truncate text-white">
+                {user.name}
+              </p>
               <p className="text-[10px] text-foreground/40 font-bold uppercase tracking-wider truncate">
-                {/* Organisation would come from session if we added it to the JWT */}
-                Institutional Admin
+                {user.organisation}
               </p>
             </div>
           </div>
-          <button 
-            onClick={() => signOut({ callbackUrl: "/auth/login" })}
+          <button
+            type="button"
+            onClick={logout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-red-500 hover:bg-red-500/10 transition-all"
           >
             <LogOut className="w-5 h-5" />
@@ -113,12 +140,26 @@ export default function DashboardLayout({
 
       {/* Mobile Bottom Nav */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 glass border-t border-white/5 z-50 flex justify-around p-3">
-        {actualNavItems.map((item) => {
+        {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
-            <Link key={item.label} href={item.href} className="flex flex-col items-center gap-1">
-              <item.icon className={`w-6 h-6 ${isActive ? "text-primary" : "text-foreground/40"}`} />
-              <span className={`text-[10px] font-bold ${isActive ? "text-primary" : "text-foreground/40"}`}>{item.label}</span>
+            <Link
+              key={item.label}
+              href={item.href}
+              className="flex flex-col items-center gap-1"
+            >
+              <item.icon
+                className={`w-6 h-6 ${
+                  isActive ? "text-primary" : "text-foreground/40"
+                }`}
+              />
+              <span
+                className={`text-[10px] font-bold ${
+                  isActive ? "text-primary" : "text-foreground/40"
+                }`}
+              >
+                {item.label}
+              </span>
             </Link>
           );
         })}

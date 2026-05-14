@@ -1,24 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
-import { 
-  FileCheck, 
-  ShieldCheck, 
-  ShieldAlert, 
+import {
+  FileCheck,
+  ShieldCheck,
+  ShieldAlert,
   ArrowRight,
   Shield,
-  Loader2
 } from "lucide-react";
 import Link from "next/link";
-
-type Verification = {
-  id: string;
-  documentName: string;
-  date: string;
-  verdict: "AUTHENTIC" | "SUSPICIOUS" | "FAKE";
-  trustScore: number;
-};
+import { useAuth } from "@/context/AuthContext";
+import { api, type VerificationListItem } from "@/lib/api";
 
 type Stats = {
   total: number;
@@ -27,27 +19,28 @@ type Stats = {
 };
 
 export default function DashboardPage() {
-  const { data: session } = useSession();
-  const [verifications, setVerifications] = useState<Verification[]>([]);
+  const { user } = useAuth();
+  const [verifications, setVerifications] = useState<VerificationListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<Stats>({ total: 0, authentic: 0, flagged: 0 });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/verifications?limit=5");
-        const data = await response.json();
-        
-        // Ensure data is an array
-        const verificationsList = Array.isArray(data) ? data : [];
-        setVerifications(verificationsList);
-        
-        // Compute stats (in a real app, these would come from a dedicated stats endpoint)
+        // The list endpoint reports `total` per query — derive real stats from
+        // three lightweight (limit:1) calls plus one for the recent table.
+        const [all, authentic, flagged, recent] = await Promise.all([
+          api.listVerifications({ limit: 1 }),
+          api.listVerifications({ limit: 1, verdict: "AUTHENTIC" }),
+          api.listVerifications({ limit: 1, verdict: "FAKE" }),
+          api.listVerifications({ limit: 5 }),
+        ]);
         setStats({
-          total: verificationsList.length * 12, // Mocking some numbers for visual effect
-          authentic: Math.floor(verificationsList.length * 9.5),
-          flagged: Math.floor(verificationsList.length * 2.5),
+          total: all.total,
+          authentic: authentic.total,
+          flagged: flagged.total,
         });
+        setVerifications(recent.data);
       } catch (error) {
         console.error("Failed to fetch verifications:", error);
       } finally {
@@ -65,7 +58,7 @@ export default function DashboardPage() {
     return "Good evening";
   };
 
-  const firstName = session?.user?.name?.split(" ")[0] || "User";
+  const firstName = user?.name?.split(" ")[0] || "User";
 
   const getVerdictStyles = (verdict: string) => {
     switch (verdict) {
@@ -165,14 +158,14 @@ export default function DashboardPage() {
                   {verifications.map((v) => (
                     <tr key={v.id} className="hover:bg-white/[0.02] transition-colors group">
                       <td className="px-8 py-6 font-bold text-white text-sm">{v.documentName}</td>
-                      <td className="px-8 py-6 text-foreground/50 text-xs font-medium">{new Date(v.date).toLocaleDateString()}</td>
+                      <td className="px-8 py-6 text-foreground/50 text-xs font-medium">{new Date(v.createdAt).toLocaleDateString()}</td>
                       <td className="px-8 py-6">
-                        <span className={`px-3 py-1 rounded-full text-[10px] font-black border tracking-wider ${getVerdictStyles(v.verdict)}`}>
-                          {v.verdict}
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-black border tracking-wider ${getVerdictStyles(v.verdict ?? "")}`}>
+                          {v.verdict ?? v.status.toUpperCase()}
                         </span>
                       </td>
-                      <td className={`px-8 py-6 font-heading font-black text-lg ${getScoreColor(v.trustScore)}`}>
-                        {v.trustScore}%
+                      <td className={`px-8 py-6 font-heading font-black text-lg ${v.trustScore != null ? getScoreColor(v.trustScore) : "text-foreground/30"}`}>
+                        {v.trustScore != null ? `${v.trustScore}%` : "—"}
                       </td>
                       <td className="px-8 py-6 text-right">
                         <Link href={`/verify/${v.id}`} className="inline-flex items-center gap-1.5 text-sm font-bold text-foreground/30 group-hover:text-primary transition-all">

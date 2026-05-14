@@ -3,10 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Shield, Eye, EyeOff, Loader2, CheckCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import { useAuth } from "@/context/AuthContext";
+import { ApiError } from "@/lib/api";
 
 type RegisterForm = {
   fullName: string;
@@ -22,6 +23,7 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { register: signUp } = useAuth();
 
   const {
     register,
@@ -35,45 +37,24 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterForm) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
-      // 1. Register the user
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.fullName,
-          organisation: data.organisation,
-          email: data.email,
-          password: data.password,
-        }),
-      });
-
-      if (response.status === 409) {
-        setError("An account with this email already exists");
-        setIsLoading(false);
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error("Registration failed");
-      }
-
-      // 2. Automatically sign in
-      const result = await signIn("credentials", {
-        redirect: false,
+      // Registers the user, then signs in with the same credentials.
+      await signUp({
+        name: data.fullName,
+        organisation: data.organisation,
         email: data.email,
         password: data.password,
       });
-
-      if (result?.error) {
-        router.push("/auth/login?error=auto-login-failed");
-      } else {
-        router.push("/dashboard");
-      }
+      router.push("/dashboard");
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
-    } finally {
+      if (err instanceof ApiError && err.status === 409) {
+        setError("An account with this email already exists");
+      } else if (err instanceof ApiError && err.status === 422) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
       setIsLoading(false);
     }
   };
