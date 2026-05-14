@@ -164,7 +164,7 @@ export default function VerifyPage() {
                 if (droppedFile) validateAndSetFile(droppedFile);
               }}
               onClick={() => fileInputRef.current?.click()}
-              className={`relative border-2 border-dashed rounded-[2.5rem] p-20 flex flex-col items-center justify-center gap-4 transition-all cursor-pointer group ${
+              className={`relative border-2 border-dashed rounded-[2.5rem] p-10 sm:p-16 md:p-20 flex flex-col items-center justify-center gap-4 transition-all cursor-pointer group ${
                 isDragActive
                   ? "border-primary bg-primary/5 scale-[1.02]"
                   : "border-card-border hover:border-primary hover:bg-white/[0.02]"
@@ -411,7 +411,7 @@ export default function VerifyPage() {
       {step === 4 && result && verificationId && (
         <div className="space-y-10 reveal active">
           <div
-            className={`p-10 rounded-[3rem] border transition-all duration-700 ${
+            className={`p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border transition-all duration-700 ${
               result.verdict === "AUTHENTIC"
                 ? "bg-[#052e16] border-[#16A34A]"
                 : result.verdict === "SUSPICIOUS"
@@ -442,7 +442,7 @@ export default function VerifyPage() {
 
               <div>
                 <h2
-                  className={`text-5xl font-heading font-black mb-2 ${
+                  className={`text-4xl sm:text-5xl font-heading font-black mb-2 ${
                     result.verdict === "AUTHENTIC"
                       ? "text-[#16A34A]"
                       : result.verdict === "SUSPICIOUS"

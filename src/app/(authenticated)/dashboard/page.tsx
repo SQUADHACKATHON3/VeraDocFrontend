@@ -119,7 +119,7 @@ export default function DashboardPage() {
           <h3 className="text-xl font-heading font-bold mb-2 text-white">Ready to verify a document?</h3>
           <p className="text-foreground/50 font-medium">Upload and get results in under 10 seconds.</p>
         </div>
-        <Link href="/verify" className="bg-primary hover:bg-primary-hover text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-2 transition-all hover:scale-[1.02]">
+        <Link href="/verify" className="w-full md:w-auto bg-primary hover:bg-primary-hover text-white px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all hover:scale-[1.02]">
           New Verification <ArrowRight className="w-5 h-5" />
         </Link>
       </div>
@@ -143,7 +143,9 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : verifications.length > 0 ? (
-            <div className="overflow-x-auto">
+            <>
+              {/* Desktop Table */}
+              <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-white/5">
@@ -176,9 +178,39 @@ export default function DashboardPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
+              </div>
+
+              {/* Mobile Cards */}
+              <div className="md:hidden divide-y divide-white/5">
+                {verifications.map((v) => (
+                  <Link
+                    key={v.id}
+                    href={`/verify/${v.id}`}
+                    className="block p-5 sm:p-6 space-y-4"
+                  >
+                    <div className="flex justify-between items-start gap-3">
+                      <span className="font-bold text-white text-sm break-words min-w-0">{v.documentName}</span>
+                      <span className={`shrink-0 px-2 py-0.5 rounded-full text-[8px] font-black border tracking-wider ${getVerdictStyles(v.verdict ?? "")}`}>
+                        {v.verdict ?? v.status.toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-end gap-3">
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">{new Date(v.createdAt).toLocaleDateString()}</p>
+                        <p className={`text-sm font-heading font-black ${v.trustScore != null ? getScoreColor(v.trustScore) : "text-foreground/30"}`}>
+                          {v.trustScore != null ? `${v.trustScore}% Trust` : "Pending"}
+                        </p>
+                      </div>
+                      <span className="text-xs font-bold text-primary flex items-center gap-1 shrink-0">
+                        View <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </>
           ) : (
-            <div className="p-20 text-center flex flex-col items-center justify-center space-y-6">
+            <div className="p-10 md:p-20 text-center flex flex-col items-center justify-center space-y-6">
               <div className="w-20 h-20 rounded-3xl bg-card flex items-center justify-center border border-card-border">
                 <Shield className="w-10 h-10 text-foreground/20" />
               </div>

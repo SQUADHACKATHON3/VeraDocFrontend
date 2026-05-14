@@ -171,12 +171,12 @@ export default function VerificationResultPage() {
   };
 
   return (
-    <div className="max-w-[760px] mx-auto p-6 md:p-10 lg:pt-20 space-y-8 pb-32 lg:pb-20">
+    <div className="max-w-[760px] mx-auto p-6 md:p-10 lg:pt-20 space-y-8 pb-56 lg:pb-20">
       {/* Verdict Banner */}
       <div
-        className={`w-full p-8 md:p-10 rounded-[3rem] border ${config.bg} ${config.border} flex flex-col md:flex-row items-center justify-between gap-8 reveal active`}
+        className={`w-full p-6 sm:p-8 md:p-10 rounded-[2rem] md:rounded-[3rem] border ${config.bg} ${config.border} flex flex-col md:flex-row items-center text-center md:text-left justify-between gap-6 md:gap-8 reveal active`}
       >
-        <div className="flex items-center gap-6">
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
           <div className={`p-4 rounded-3xl bg-white/10 ${config.text}`}>
             <config.icon className="w-12 h-12" />
           </div>
@@ -184,7 +184,7 @@ export default function VerificationResultPage() {
             <p className="text-xs font-bold uppercase tracking-[0.3em] opacity-60 mb-1">
               VERDICT
             </p>
-            <h1 className="text-5xl font-heading font-black">{data.verdict}</h1>
+            <h1 className="text-4xl sm:text-5xl font-heading font-black break-words">{data.verdict}</h1>
           </div>
         </div>
 
@@ -447,7 +447,7 @@ export default function VerificationResultPage() {
 
       {/* Action Bar */}
       <div
-        className="fixed bottom-0 left-0 right-0 lg:static bg-dark-bg lg:bg-transparent border-t lg:border-none border-card-border p-6 lg:p-0 flex flex-col md:flex-row items-center justify-between gap-4 z-40 reveal active"
+        className="fixed bottom-[72px] left-0 right-0 lg:static lg:bottom-auto bg-dark-bg lg:bg-transparent border-t lg:border-none border-card-border p-6 lg:p-0 flex flex-col md:flex-row items-center justify-between gap-4 z-40 reveal active"
         style={{ transitionDelay: "400ms" }}
       >
         <Link

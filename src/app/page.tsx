@@ -47,7 +47,7 @@ export default function LandingPage() {
         <section className="relative pt-24 pb-16 md:pt-36 md:pb-24 overflow-hidden bg-dark-bg">
 
           <div className="container mx-auto px-6 relative z-10">
-            <div className="flex flex-col lg:flex-row items-center gap-16">
+            <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
               <div className="lg:w-3/5 text-center lg:text-left">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary-light text-xs font-semibold mb-6 animate-in fade-in slide-in-from-bottom-2 duration-700">
                   <span className="relative flex h-2 w-2">
@@ -57,12 +57,12 @@ export default function LandingPage() {
                   Trusted by institutions across Nigeria
                 </div>
                 
-                <h1 className="text-5xl md:text-7xl font-heading font-black leading-[1.1] mb-6 reveal">
+                <h1 className="text-4xl sm:text-5xl md:text-7xl font-heading font-black leading-[1.1] mb-6 reveal">
                   Stop Trusting. <br />
                   <span className="text-primary-light">Start Verifying.</span>
                 </h1>
-                
-                <p className="text-xl text-foreground/70 max-w-2xl mb-10 leading-relaxed reveal" style={{ transitionDelay: "200ms" }}>
+
+                <p className="text-lg sm:text-xl text-foreground/70 max-w-2xl mb-10 leading-relaxed reveal" style={{ transitionDelay: "200ms" }}>
                   VeraDoc detects fake academic certificates and transcripts in seconds. 
                   Upload, pay, verify — <span className="text-foreground font-medium">before the damage is done.</span>
                 </p>
@@ -238,12 +238,12 @@ export default function LandingPage() {
         {/* CTA Banner */}
         <section className="py-16 px-6">
           <div className="container mx-auto">
-            <div className="bg-card border-l-4 border-primary rounded-[40px] p-12 md:p-20 text-center relative overflow-hidden reveal">
+            <div className="bg-card border-l-4 border-primary rounded-[2rem] md:rounded-[40px] p-8 sm:p-12 md:p-20 text-center relative overflow-hidden reveal">
               <div className="relative z-10">
-                <h2 className="text-4xl md:text-6xl font-heading font-black mb-6 leading-tight">
+                <h2 className="text-3xl sm:text-4xl md:text-6xl font-heading font-black mb-6 leading-tight">
                   Your next bad hire could <br /> cost you everything.
                 </h2>
-                <p className="text-xl text-foreground/60 mb-10 max-w-xl mx-auto">
+                <p className="text-lg sm:text-xl text-foreground/60 mb-10 max-w-xl mx-auto">
                   Join the institutions already verifying smarter with Nigeria's most advanced AI document forensics.
                 </p>
                 <Link href="/auth/register" className="inline-flex bg-white text-dark-bg hover:scale-105 transition-transform px-10 py-5 rounded-full font-bold text-lg">

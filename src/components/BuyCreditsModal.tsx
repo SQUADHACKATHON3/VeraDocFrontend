@@ -109,10 +109,10 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
         className="absolute inset-0 bg-dark-bg/80"
         onClick={handleClose}
       />
-      <div className="relative w-full max-w-md glass p-8 md:p-10 rounded-[3rem] shadow-sharp space-y-6">
+      <div className="relative w-full max-w-md glass p-6 sm:p-8 md:p-10 rounded-[2rem] sm:rounded-[3rem] shadow-sharp space-y-6">
         <button
           onClick={handleClose}
-          className="absolute right-8 top-8 p-2 rounded-lg hover:bg-white/5 text-foreground/20 hover:text-white transition-all"
+          className="absolute right-6 top-6 sm:right-8 sm:top-8 p-2 rounded-lg hover:bg-white/5 text-foreground/20 hover:text-white transition-all"
         >
           <X className="w-5 h-5" />
         </button>

@@ -268,16 +268,16 @@ export default function SettingsPage() {
       {showDeleteModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 md:p-10">
           <div className="absolute inset-0 bg-dark-bg/80" onClick={() => setShowDeleteModal(false)}></div>
-          <div className="relative w-full max-w-md glass p-10 rounded-[3rem] shadow-sharp space-y-8 reveal active">
-            <button type="button" aria-label="Close" onClick={() => setShowDeleteModal(false)} className="absolute right-8 top-8 p-2 rounded-lg hover:bg-white/5 text-foreground/20 hover:text-white transition-all">
+          <div className="relative w-full max-w-md glass p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] shadow-sharp space-y-8 reveal active">
+            <button type="button" aria-label="Close" onClick={() => setShowDeleteModal(false)} className="absolute right-6 top-6 sm:right-8 sm:top-8 p-2 rounded-lg hover:bg-white/5 text-foreground/20 hover:text-white transition-all">
               <X className="w-5 h-5" />
             </button>
-            
+
             <div className="text-center space-y-4">
               <div className="w-16 h-16 rounded-3xl bg-red-500/10 flex items-center justify-center text-red-500 mx-auto mb-6">
                 <ShieldAlert className="w-8 h-8" />
               </div>
-              <h2 className="text-4xl font-heading font-black">Are you sure?</h2>
+              <h2 className="text-3xl sm:text-4xl font-heading font-black">Are you sure?</h2>
               <p className="text-foreground/50 font-medium leading-relaxed">
                 This will permanently delete your account and all associated verification data.
               </p>

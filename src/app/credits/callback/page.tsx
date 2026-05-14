@@ -47,7 +47,7 @@ function CallbackContent() {
 
   return (
     <div className="min-h-screen bg-dark-bg text-foreground font-sans flex items-center justify-center p-6">
-      <div className="relative w-full max-w-md glass p-8 md:p-10 rounded-[3rem] space-y-6 text-center">
+      <div className="relative w-full max-w-md glass p-6 sm:p-8 md:p-10 rounded-[2rem] sm:rounded-[3rem] space-y-6 text-center">
         <Link
           href="/"
           className="inline-flex items-center gap-2 text-foreground/40 hover:text-white transition-colors"
