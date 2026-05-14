@@ -1,43 +1,43 @@
-# VeraDoc — API Documentation
-**Version:** 1.0.0
+# VeraDoc Backend — API Documentation
+
+**Version:** 2.0.0
 **Organisation:** github.com/SQUADHACKATHON3
+**Service:** VeraDocBacktend (FastAPI)
 **Last Updated:** May 2026
+
+This is the canonical request/response contract between the Next.js frontend and
+the FastAPI backend. The backend is a single service that owns auth, users,
+credits, payments, verification, and AI analysis.
 
 ---
 
 ## Base URLs
 
-| Service | Environment | URL |
-|---|---|---|
-| Next.js API | Local | `http://localhost:3000/api` |
-| Next.js API | Production | `https://veradoc.vercel.app/api` |
-| FastAPI AI Service | Local | `http://localhost:8000` |
-| FastAPI AI Service | Production | `https://backend-sf30.onrender.com` |
+| Environment | URL |
+|---|---|
+| Local | `http://127.0.0.1:8000` |
+| Production | `https://backend-sf30.onrender.com` |
+
+- **OpenAPI / Swagger UI:** `GET {BASE_URL}/docs` (interactive try-out).
+- **Content type:** `application/json` unless noted (`/api/verify/initiate` is
+  `multipart/form-data`).
+- **Auth:** send `Authorization: Bearer <access_token>` on every protected route.
+- **IDs:** UUID strings (e.g. `"a1b2c3d4-e5f6-7890-abcd-ef1234567890"`).
+- **Dates:** ISO 8601 with timezone (e.g. `"2026-05-13T10:15:00+00:00"`).
+- **CORS:** the backend does **not** ship CORS middleware by default. If the web
+  app is on another origin, enable CORS on the API or proxy through the same host.
 
 ---
 
-## Authentication
+## Response Format & Errors
 
-All protected Next.js API routes require a valid NextAuth session. Requests without a session return `401`.
-
-The FastAPI service is internal-only and protected by a shared `X-Internal-Key` header. It is never called directly from the frontend.
-
-```
-Authorization model:
-- Public routes: no auth required
-- Protected routes: NextAuth JWT session (cookie-based)
-- Internal routes (FastAPI): X-Internal-Key header
-```
-
----
-
-## Response Format
-
-All endpoints return JSON. Errors follow this shape:
+All endpoints return JSON. FastAPI wraps errors as:
 
 ```json
-{ "error": "Human-readable message", "detail": "Optional technical detail" }
+{ "detail": "Human-readable message" }
 ```
+
+`detail` may be a string, an object, or an array (validation errors).
 
 ### HTTP Status Codes
 
@@ -45,178 +45,209 @@ All endpoints return JSON. Errors follow this shape:
 |---|---|
 | `200` | Success |
 | `201` | Resource created |
-| `400` | Bad request or validation error |
-| `401` | Unauthenticated |
+| `400` | Bad request / invalid file / invalid pack |
+| `401` | Missing/invalid Bearer, wrong password, or bad refresh token |
+| `402` | Insufficient credits |
 | `403` | Forbidden — accessing another user's resource |
 | `404` | Resource not found |
 | `409` | Conflict — e.g. duplicate email |
-| `422` | Unprocessable entity |
+| `422` | Validation error (FastAPI) — `detail` lists invalid fields |
 | `500` | Internal server error |
 
 ---
 
-## Next.js API Routes
+## 1. Authentication
+
+### 1.1 Register
+`POST /api/auth/register` · **Auth:** none
+
+**Body:**
+| Field | Type | Rules |
+|---|---|---|
+| `name` | string | 1–200 chars |
+| `organisation` | string | 1–200 chars |
+| `email` | string | Valid, unique email |
+| `password` | string | Min 8 chars |
+
+**`201` response:**
+```json
+{ "message": "Account created successfully", "credits": 1 }
+```
+New accounts start with **1 free credit**. Registration does **not** auto-login.
+
+**`409`:** `{ "detail": "Email already registered" }`
 
 ---
 
-### Auth
+### 1.2 Login
+`POST /api/auth/login` · **Auth:** none
 
----
+**Body:**
+```json
+{ "email": "user@example.com", "password": "secret" }
+```
 
-#### Register
-`POST /api/auth/register`
-
-Create a new verifier account.
-
-**Auth:** None
-
-**Request Body:**
+**`200` response (`TokenOut`):**
 ```json
 {
-  "name": "Samkiel",
-  "organisation": "OAU Engineering Dept",
-  "email": "samkiel@veradoc.com",
-  "password": "securepassword123"
+  "access_token": "<jwt>",
+  "refresh_token": "<jwt>",
+  "token_type": "bearer"
+}
+```
+Store both tokens. (Frontend currently stores both in `localStorage`.)
+
+**`401`:** `{ "detail": "Invalid credentials" }`
+
+---
+
+### 1.3 Refresh Access Token
+`POST /api/auth/refresh?refresh_token=<refresh_token>` · **Auth:** none
+
+`refresh_token` is a **query parameter** (the full JWT string, URL-encoded).
+
+**`200` response:** same shape as login.
+
+**`401`:** `{ "detail": "Unauthorized" }`
+
+---
+
+### 1.4 Current User
+`GET /api/auth/me` · **Auth:** Bearer
+
+**`200` response (`MeOut`):**
+```json
+{
+  "id": "uuid",
+  "name": "Jane Doe",
+  "organisation": "Acme Ltd",
+  "email": "user@example.com",
+  "credits": 5
+}
+```
+Use after login and after a credit purchase to refresh the balance.
+
+---
+
+## 2. Credits (Squad Checkout)
+
+Pricing is driven by `CREDIT_PRICE_KOBO` (default `70000` = ₦700 per credit).
+Packs: **1, 5, 10, 20** credits.
+
+### 2.1 List Packs
+`GET /api/credits/packs` · **Auth:** none (public catalogue)
+
+**`200` response (`CreditPacksOut`):**
+```json
+{
+  "packs": [
+    { "credits": 1,  "amountKobo": 70000 },
+    { "credits": 5,  "amountKobo": 350000 },
+    { "credits": 10, "amountKobo": 700000 },
+    { "credits": 20, "amountKobo": 1400000 }
+  ],
+  "pricePerCreditKobo": 70000,
+  "currency": "NGN"
+}
+```
+Display amounts as **₦ (amountKobo / 100)**.
+
+---
+
+### 2.2 Start a Purchase
+`POST /api/credits/purchase/initiate` · **Auth:** Bearer
+
+**Body:** `{ "pack": 5 }` — `pack` must be `1`, `5`, `10`, or `20`.
+
+**`200` response (`CreditPurchaseInitiateOut`):**
+```json
+{
+  "purchaseId": "uuid",
+  "checkoutUrl": "https://...",
+  "credits": 5,
+  "amountKobo": 350000
 }
 ```
 
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `name` | string | Yes | Full name |
-| `organisation` | string | Yes | Company or institution |
-| `email` | string | Yes | Must be unique |
-| `password` | string | Yes | Min 8 characters |
+**Frontend flow:**
+1. Call initiate → receive `checkoutUrl` and `purchaseId`.
+2. Open `checkoutUrl` (new tab / redirect).
+3. After the user pays, Squad notifies the **backend** webhook; credits are
+   updated server-side.
+4. Poll `GET /api/credits/purchases/{purchaseId}` (or `GET /api/auth/me`) until
+   `status` is `completed` / `credits` increases.
 
-**Response `201`:**
-```json
-{ "message": "Account created successfully" }
-```
-
-**Response `409`:**
-```json
-{ "error": "Email already registered" }
-```
-
-**Response `400`:**
-```json
-{ "error": "All fields are required" }
-```
+**`400`:** invalid pack.
 
 ---
 
-#### NextAuth Session
-`POST /api/auth/[...nextauth]`
+### 2.3 Purchase Status
+`GET /api/credits/purchases/{purchase_id}` · **Auth:** Bearer (must own it)
 
-Handled internally by NextAuth.js. Used by the frontend `signIn()` call.
+**`200` response:**
+```json
+{ "purchaseId": "uuid", "status": "pending", "credits": 5 }
+```
+`status`: `pending` | `completed` | `failed`.
 
-**Provider:** Credentials (email + password)
-
-**Returns:** JWT session with `id`, `name`, `email`, `organisation`
+**`404`:** not found or not yours.
 
 ---
 
-### Verifications
+## 3. Document Verification
 
----
+Each successful initiate **consumes 1 credit immediately**. There is no Squad
+step on verify — payment happens up front via credit packs.
 
-#### Initiate Verification
-`POST /api/verify/initiate`
+### 3.1 Start Verification
+`POST /api/verify/initiate` · **Auth:** Bearer · **Content-Type:** `multipart/form-data`
 
-Upload a document and create a Squad payment session.
+| Field | Type | Notes |
+|---|---|---|
+| `file` | file | Required. PDF, JPEG, or PNG. Max 5 MB. |
 
-**Auth:** Required
-
-**Request:** `multipart/form-data`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `file` | file | Yes | PDF, JPG, PNG, JPEG. Max 5MB |
-
-**Response `200`:**
-```json
-{
-  "verificationId": "6645f3c2a1b2c3d4e5f60001",
-  "checkoutUrl": "https://sandbox-pay.squadco.com/4678388588350909090AH"
-}
+**Example:**
+```js
+const form = new FormData();
+form.append("file", fileBlob, "certificate.pdf");
+await fetch(`${BASE}/api/verify/initiate`, {
+  method: "POST",
+  headers: { Authorization: `Bearer ${accessToken}` },
+  body: form,
+});
 ```
 
-**Response `400`:**
+**`200` response (`InitiateOut`):**
 ```json
-{ "error": "Invalid file type. Accepted: PDF, JPG, PNG, JPEG" }
+{ "verificationId": "uuid", "creditsRemaining": 4 }
 ```
+Processing runs **asynchronously** (in-process background task) after the
+response returns. Poll §3.2 with `verificationId`.
 
-**Response `400`:**
-```json
-{ "error": "File size exceeds 5MB limit" }
-```
-
-**Response `401`:**
-```json
-{ "error": "Unauthorized" }
-```
-
----
-
-#### Squad Payment Webhook
-`POST /api/verify/webhook`
-
-Receives Squad payment confirmation. Triggers AI analysis pipeline.
-
-**Auth:** None — verified via `x-squad-signature` HMAC header
-
-**Headers:**
-| Header | Value |
+**Errors:**
+| Status | When |
 |---|---|
-| `x-squad-signature` | HMAC-SHA512 of raw request body using `SQUAD_SECRET_KEY` |
+| `400` | Wrong file type or file > 5 MB |
+| `401` | Missing/invalid token |
+| `402` | Not enough credits |
 
-**Request Body (sent by Squad):**
+**`402` body** (object inside `detail`):
 ```json
 {
-  "Event": "charge_successful",
-  "Body": {
-    "transaction_ref": "6645f3c2a1b2c3d4e5f60001",
-    "transaction_status": "Success",
-    "amount": 100000,
-    "currency": "NGN",
-    "email": "user@example.com"
+  "detail": {
+    "message": "Insufficient credits. Buy a credit pack to run a verification.",
+    "credits": 0
   }
 }
 ```
-
-**Logic:**
-1. Verify `x-squad-signature`
-2. Check event is `charge_successful`
-3. Update Verification `paymentStatus: "paid"`, `status: "processing"`
-4. Forward document to FastAPI `/analyze`
-5. Save result, update `status: "complete"`
-
-**Response `200`:**
-```json
-{ "received": true }
-```
-
-**Response `401`:**
-```json
-{ "error": "Invalid signature" }
-```
-
-> Always return `200` to Squad immediately to prevent retries, even if downstream processing takes time.
+Send the user to the credit-purchase flow (§2.2) on `402`.
 
 ---
 
-#### Poll Verification Status
-`GET /api/verify/[id]/status`
+### 3.2 Verification Status (poll)
+`GET /api/verify/{verification_id}/status` · **Auth:** Bearer
 
-Poll the current status of a verification. Used by the frontend during the processing state.
-
-**Auth:** Required
-
-**Path Params:**
-| Param | Type | Description |
-|---|---|---|
-| `id` | string | Verification `_id` |
-
-**Response `200` — Processing:**
+**`200` response (`StatusOut`):**
 ```json
 {
   "status": "processing",
@@ -225,73 +256,46 @@ Poll the current status of a verification. Used by the frontend during the proce
   "summary": null
 }
 ```
+`status`: `pending` | `processing` | `complete` | `error`.
 
-**Response `200` — Complete:**
-```json
-{
-  "status": "complete",
-  "verdict": "AUTHENTIC",
-  "trustScore": 91,
-  "summary": "Document passed all forensic checks with high confidence."
-}
-```
+When `status` is `complete`, `verdict`, `trustScore`, and `summary` are usually
+set. On `error`, they may stay `null` — load the detail endpoint or handle empty.
 
-**Response `200` — Error:**
-```json
-{
-  "status": "error",
-  "verdict": null,
-  "trustScore": null,
-  "summary": null
-}
-```
+**Errors:** `404`, `403` (wrong user).
 
-**Response `404`:**
-```json
-{ "error": "Verification not found" }
-```
-
-**Response `403`:**
-```json
-{ "error": "Forbidden" }
-```
+**Suggested polling:** every 2–4 s while `processing`; stop on `complete`/`error`.
 
 ---
 
-#### Get All Verifications
-`GET /api/verifications`
+## 4. Verification History & Full Report
 
-Retrieve all verifications for the authenticated user with filtering and pagination.
+### 4.1 List Verifications
+`GET /api/verifications` · **Auth:** Bearer
 
-**Auth:** Required
+**Query params:**
+| Param | Default | Notes |
+|---|---|---|
+| `page` | `1` | ≥ 1 |
+| `limit` | `10` | 1–100 |
+| `verdict` | — | Optional: `AUTHENTIC`, `SUSPICIOUS`, or `FAKE` |
+| `search` | — | Case-insensitive substring on `documentName` |
 
-**Query Parameters:**
-| Param | Type | Default | Description |
-|---|---|---|---|
-| `page` | number | `1` | Page number |
-| `limit` | number | `10` | Results per page |
-| `verdict` | string | — | Filter: `AUTHENTIC`, `SUSPICIOUS`, `FAKE` |
-| `search` | string | — | Search by document name |
+**Example:** `GET /api/verifications?page=1&limit=10&verdict=SUSPICIOUS&search=cert`
 
-**Example Request:**
-```
-GET /api/verifications?page=1&limit=10&verdict=FAKE
-```
-
-**Response `200`:**
+**`200` response (`VerificationListOut`):**
 ```json
 {
   "data": [
     {
-      "_id": "6645f3c2a1b2c3d4e5f60001",
-      "documentName": "transcript.pdf",
-      "verdict": "FAKE",
-      "trustScore": 12,
+      "id": "uuid",
+      "documentName": "cert.pdf",
+      "verdict": "SUSPICIOUS",
+      "trustScore": 65,
       "status": "complete",
-      "createdAt": "2026-05-15T10:32:00Z"
+      "createdAt": "2026-05-13T10:00:00+00:00"
     }
   ],
-  "total": 1,
+  "total": 42,
   "page": 1,
   "limit": 10
 }
@@ -299,308 +303,144 @@ GET /api/verifications?page=1&limit=10&verdict=FAKE
 
 ---
 
-#### Get Single Verification
-`GET /api/verifications/[id]`
+### 4.2 Verification Detail
+`GET /api/verifications/{verification_id}` · **Auth:** Bearer (must own it)
 
-Retrieve full details of a single verification including all AI output.
-
-**Auth:** Required. User must own the verification.
-
-**Path Params:**
-| Param | Type | Description |
-|---|---|---|
-| `id` | string | Verification `_id` |
-
-**Response `200`:**
+**`200` response (`VerificationDetailOut`):**
 ```json
 {
-  "_id": "6645f3c2a1b2c3d4e5f60001",
-  "documentName": "oluwaseun_certificate.pdf",
-  "squadTransactionRef": "4678388588350909090AH",
+  "id": "uuid",
+  "documentName": "cert.pdf",
+  "squadTransactionRef": null,
   "paymentStatus": "paid",
   "status": "complete",
   "verdict": "SUSPICIOUS",
-  "trustScore": 54,
-  "flags": [
-    "Seal placement inconsistent with standard certificate format",
-    "Font weight varies across different sections"
+  "trustScore": 65,
+  "flags": ["..."],
+  "passedChecks": ["..."],
+  "summary": "One paragraph explanation.",
+  "issuerContactHints": null,
+  "createdAt": "2026-05-13T10:00:00+00:00",
+  "completedAt": "2026-05-13T10:01:30+00:00"
+}
+```
+
+**Enums:**
+- `paymentStatus`: `pending` | `paid` | `failed`
+- `status`: `pending` | `processing` | `complete` | `error`
+- `verdict`: `AUTHENTIC` | `SUSPICIOUS` | `FAKE` | `null` (until done)
+
+**Errors:** `404`, `403`.
+
+#### `issuerContactHints`
+
+- **`null`** — no issuer-hint block (verdict outside the trigger band, no web
+  path taken, or legacy data).
+- **Object** — present when the backend stored hints (typically **SUSPICIOUS**
+  with trust **~45–70** via the web path):
+
+```json
+{
+  "included": true,
+  "trigger": "suspicious_45_70_trust",
+  "unverified": true,
+  "disclaimer": "...",
+  "items": [
+    {
+      "type": "email",
+      "value": "admissions@example.edu.ng",
+      "sourceUrl": "https://...",
+      "sourceTitle": "..."
+    }
   ],
-  "passedChecks": [
-    "Date format valid",
-    "Institution name correctly spelled",
-    "Signature present"
-  ],
-  "summary": "Document shows moderate forensic anomalies suggesting possible tampering around the institutional seal.",
-  "createdAt": "2026-05-15T10:32:00Z",
-  "completedAt": "2026-05-15T10:32:08Z"
+  "suggestedOutreachMessage": "Subject: ...\n\nDear ...",
+  "suggestedOutreachMessageNote": "...",
+  "outreachMessageSource": "ai_merge",
+  "note": null
 }
 ```
 
-**Response `404`:**
-```json
-{ "error": "Verification not found" }
-```
-
-**Response `403`:**
-```json
-{ "error": "Forbidden" }
-```
+- `items` may be empty if no email/phone was found in snippets; then `note` may
+  be `"no_contacts_found_in_snippets"`.
+- `outreachMessageSource`: `ai_merge` | `template_fallback` | `null` (older rows).
+- All contacts are **unverified** (from public web snippets).
+- Show `suggestedOutreachMessage` as a **draft** with a disclaimer and
+  `suggestedOutreachMessageNote` as small print. Users must replace placeholders
+  and proofread before sending.
 
 ---
 
-### User
+## 5. Account Settings
+
+### 5.1 Change Password
+`PUT /api/user/password` · **Auth:** Bearer
+
+**Body:**
+```json
+{ "currentPassword": "old", "newPassword": "newlonger" }
+```
+
+**`200`:** `{ "message": "Password updated successfully" }`
+**`401`:** current password is wrong.
 
 ---
 
-#### Change Password
-`PUT /api/user/password`
+### 5.2 Delete Account
+`DELETE /api/user` · **Auth:** Bearer
 
-**Auth:** Required
+**`200`:** `{ "message": "Account deleted" }`
 
-**Request Body:**
-```json
-{
-  "currentPassword": "oldpassword123",
-  "newPassword": "newpassword456"
-}
-```
-
-**Response `200`:**
-```json
-{ "message": "Password updated successfully" }
-```
-
-**Response `401`:**
-```json
-{ "error": "Current password is incorrect" }
-```
+> Removes the user record. Confirm the action in the UI before calling.
 
 ---
 
-#### Delete Account
-`DELETE /api/user`
+## 6. Server-Only: Squad Webhook (not called by the frontend)
 
-Permanently deletes the user account and all associated verifications.
+`POST /api/verify/webhook`
 
-**Auth:** Required
-
-**Response `200`:**
-```json
-{ "message": "Account deleted successfully" }
-```
+Squad calls this with a signed body to confirm payments (credit purchases). On a
+successful charge the backend marks the related purchase `completed` and
+increments the user's credits. Configure `SQUAD_WEBHOOK_CALLBACK_URL` on the
+backend to a **public HTTPS URL** that reaches this route.
 
 ---
 
-## FastAPI AI Service Routes
+## 7. Typical User Journeys
 
-> This service is internal. It is only called by the Next.js backend via `FASTAPI_SERVICE_URL`. Never expose this service URL to the client.
+### A) First-time user
+1. `POST /api/auth/register` → account created with `credits: 1`.
+2. `POST /api/auth/login` → store tokens.
+3. `POST /api/verify/initiate` with a file → `verificationId`, `creditsRemaining`.
+4. Poll `GET /api/verify/{id}/status` until `complete` / `error`.
+5. `GET /api/verifications/{id}` for the full report + optional
+   `issuerContactHints`.
 
----
+### B) Out of credits
+1. `POST /api/verify/initiate` → **`402`** → show "Buy credits".
+2. `GET /api/credits/packs` for prices.
+3. `POST /api/credits/purchase/initiate` → open `checkoutUrl`.
+4. After payment, poll `GET /api/credits/purchases/{purchaseId}` (or
+   `GET /api/auth/me`) until credits increase.
+5. Retry the verification.
 
-#### Health Check
-`GET /`
-
-**Auth:** None
-
-**Response `200`:**
-```json
-{ "status": "VeraDoc AI Service running" }
-```
-
----
-
-#### Analyze Document
-`POST /analyze`
-
-Analyze an academic document and return a forensic trust verdict.
-
-**Auth:** `X-Internal-Key` header (shared secret)
-
-**Request:** `multipart/form-data`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `file` | file | Yes | PDF, JPG, PNG, JPEG |
-
-**Headers:**
-| Header | Required | Description |
-|---|---|---|
-| `X-Internal-Key` | Yes | Shared secret matching `INTERNAL_SERVICE_KEY` env var |
-| `Content-Type` | Yes | `multipart/form-data` |
-
-**Processing:**
-1. Validate `X-Internal-Key`
-2. If PDF — convert first page to JPEG using `pdf2image`
-3. Convert image to base64
-4. Send to Groq API (`meta-llama/llama-4-scout-17b-16e-instruct`) with structured system prompt
-5. Parse and validate JSON response
-6. Return verdict
-
-**Response `200`:**
-```json
-{
-  "verdict": "FAKE",
-  "trust_score": 11,
-  "flags": [
-    "Institutional seal appears digitally inserted",
-    "Font inconsistency detected in student name field",
-    "Watermark pattern does not match known OAU format",
-    "Signature appears copied from another document"
-  ],
-  "passed_checks": [
-    "Date format valid"
-  ],
-  "summary": "Multiple strong forensic indicators of forgery detected. Document is highly likely to be fake."
-}
-```
-
-**Response `401`:**
-```json
-{ "error": "Unauthorized" }
-```
-
-**Response `422`:**
-```json
-{ "error": "Unsupported file type" }
-```
-
-**Response `500`:**
-```json
-{ "error": "AI analysis failed", "detail": "Groq API timeout" }
-```
+### C) Session refresh
+When the `access_token` expires, `POST /api/auth/refresh?refresh_token=...`,
+then retry the failed request. (The frontend's `src/lib/api.ts` does this
+automatically on a `401`.)
 
 ---
 
-## Squad API Reference
+## 8. AI Screening Reminders (for UI)
 
-VeraDoc uses the following Squad APIs. Full documentation at `https://docs.squadco.com`.
-
----
-
-#### Initiate Transaction
-`POST https://sandbox-api-d.squadco.com/transaction/initiate`
-
-Called by Tobi's Next.js API to create a payment session.
-
-**Headers:**
-```
-Authorization: Bearer <SQUAD_SECRET_KEY>
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "amount": 100000,
-  "currency": "NGN",
-  "transaction_ref": "6645f3c2a1b2c3d4e5f60001",
-  "callback_url": "https://veradoc.vercel.app/verify/6645f3c2a1b2c3d4e5f60001"
-}
-```
-
-| Field | Notes |
-|---|---|
-| `amount` | In kobo. NGN 1,000 = `100000` |
-| `transaction_ref` | Use the MongoDB Verification `_id` |
-| `callback_url` | Where Squad redirects after payment |
-
-**Response:**
-```json
-{
-  "status": 200,
-  "data": {
-    "checkout_url": "https://sandbox-pay.squadco.com/4678388588350909090AH",
-    "transaction_ref": "6645f3c2a1b2c3d4e5f60001"
-  }
-}
-```
-
----
-
-#### Verify Transaction
-`POST https://sandbox-api-d.squadco.com/transaction/verify`
-
-Manually verify a transaction status. Used as a fallback if webhook is delayed.
-
-**Headers:**
-```
-Authorization: Bearer <SQUAD_SECRET_KEY>
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "transaction_ref": "6645f3c2a1b2c3d4e5f60001"
-}
-```
-
-**Response:**
-```json
-{
-  "status": 200,
-  "data": {
-    "transaction_status": "Success",
-    "amount": 100000,
-    "currency": "NGN",
-    "email": "user@example.com"
-  }
-}
-```
-
----
-
-## Environment Variables Summary
-
-### Next.js (Vercel)
-```env
-NEXTAUTH_SECRET=
-NEXTAUTH_URL=https://veradoc.vercel.app
-
-MONGODB_URI=
-
-NEXT_PUBLIC_SQUAD_PUBLIC_KEY=
-SQUAD_SECRET_KEY=
-
-FASTAPI_SERVICE_URL=https://veradoc-ai.onrender.com
-INTERNAL_SERVICE_KEY=
-```
-
-### FastAPI (Render)
-```env
-GROQ_API_KEY=
-INTERNAL_SERVICE_KEY=
-```
-
----
-
-## Data Flow Summary
-
-```
-[Frontend] 
-  → POST /api/verify/initiate        (upload file, create verification)
-  → Redirect to Squad checkout_url   (user pays)
-  
-[Squad] 
-  → POST /api/verify/webhook         (payment confirmed)
-  
-[Next.js API]
-  → POST https://veradoc-ai.onrender.com/analyze  (forward document)
-  
-[FastAPI]
-  → Groq API (llama-4-scout-17b-16e-instruct)     (analyze document)
-  → Return JSON verdict
-  
-[Next.js API]
-  → Save result to MongoDB
-  
-[Frontend]
-  → GET /api/verify/[id]/status      (poll until complete)
-  → GET /api/verifications/[id]      (fetch full result)
-  → Render results dashboard
-```
+- Verdicts are **AI screening results**, not legal confirmation. For high-stakes
+  decisions, confirm directly with the issuing school or ministry.
+- `issuerContactHints` come from **public web snippets** — always confirm before
+  acting on them.
+- `suggestedOutreachMessage` is a **draft**; users must replace placeholders and
+  proofread before sending.
 
 ---
 
 *VeraDoc API Documentation — The Dev Team — Squad Hackathon 3.0*
+*Field names match the current Pydantic/OpenAPI models. When in doubt, use
+`{BASE_URL}/docs` against the running API.*
