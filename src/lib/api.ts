@@ -28,6 +28,7 @@ export type Me = {
   organisation: string;
   email: string;
   credits: number;
+  emailVerified: boolean;
 };
 
 export type CreditPack = { credits: number; amountKobo: number };
@@ -418,6 +419,45 @@ export const api = {
   /** Permanently deletes the authenticated user's account. */
   deleteAccount() {
     return request<{ message: string }>("/api/user", { method: "DELETE" });
+  },
+
+  /* --- new auth features --- */
+  /** Retrieves the Google OAuth URL. */
+  getGoogleAuthUrl() {
+    return request<{ url: string }>("/api/auth/google", { auth: false });
+  },
+
+  /** Verifies the user's email with a 6-digit OTP. */
+  verifyEmail(otp: string) {
+    return request<{ message: string }>("/api/auth/verify-email", {
+      method: "POST",
+      body: { otp },
+    });
+  },
+
+  /** Resends the verification OTP. */
+  resendOtp() {
+    return request<{ message: string }>("/api/auth/resend-otp", {
+      method: "POST",
+    });
+  },
+
+  /** Initiates a password reset process. */
+  forgotPassword(email: string) {
+    return request<{ message: string }>("/api/auth/forgot-password", {
+      method: "POST",
+      body: { email },
+      auth: false,
+    });
+  },
+
+  /** Completes the password reset process. */
+  resetPassword(input: { email: string; otp: string; newPassword: string }) {
+    return request<{ message: string }>("/api/auth/reset-password", {
+      method: "POST",
+      body: input,
+      auth: false,
+    });
   },
 };
 

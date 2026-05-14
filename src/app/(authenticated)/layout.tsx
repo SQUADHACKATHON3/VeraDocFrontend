@@ -35,6 +35,8 @@ export default function DashboardLayout({
   useEffect(() => {
     if (!isLoading && !user) {
       router.replace("/auth/login");
+    } else if (!isLoading && user && !user.emailVerified) {
+      router.replace("/auth/verify-email");
     }
   }, [isLoading, user, router]);
 
