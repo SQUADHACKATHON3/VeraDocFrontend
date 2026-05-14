@@ -7,7 +7,6 @@ import {
   ShieldAlert,
   ArrowRight,
   Shield,
-  Coins,
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -114,21 +113,6 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Credits Balance Card */}
-      <div className="glass glass-hover p-6 rounded-3xl flex items-center gap-5 reveal active">
-        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
-          <Coins className="w-7 h-7 text-primary-light" />
-        </div>
-        <div>
-          <p className="text-xs font-bold text-foreground/40 uppercase tracking-widest mb-0.5">Your Balance</p>
-          <p className="text-3xl font-heading font-black text-white">
-            {user?.credits ?? 0}
-            <span className="text-sm font-bold text-foreground/40 ml-1.5">
-              {user?.credits === 1 ? "credit" : "credits"}
-            </span>
-          </p>
-        </div>
-      </div>
 
       {/* Quick Action Banner */}
       <div className="bg-card border-l-4 border-primary p-8 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 reveal active">
