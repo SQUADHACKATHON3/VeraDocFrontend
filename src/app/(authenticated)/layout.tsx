@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -11,17 +11,20 @@ import {
   Settings,
   LogOut,
   Coins,
+  Plus,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import BuyCreditsModal from "@/components/BuyCreditsModal";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading, logout, refreshUser } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const [showBuyCredits, setShowBuyCredits] = useState(false);
 
   // Route guard — bounce unauthenticated users to login.
   useEffect(() => {
@@ -73,20 +76,27 @@ export default function DashboardLayout({
 
         {/* Credits balance */}
         <div className="px-4 mb-2">
-          <Link
-            href="/verify"
-            className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-primary/10 border border-primary/20 hover:border-primary/40 transition-all group"
-          >
-            <div className="flex items-center gap-2">
-              <Coins className="w-4 h-4 text-primary-light" />
-              <span className="text-xs font-bold uppercase tracking-wider text-foreground/50">
-                Credits
+          <div className="rounded-xl bg-primary/10 border border-primary/20 overflow-hidden">
+            <div className="flex items-center justify-between gap-3 px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Coins className="w-4 h-4 text-primary-light" />
+                <span className="text-xs font-bold uppercase tracking-wider text-foreground/50">
+                  Credits
+                </span>
+              </div>
+              <span className="text-lg font-heading font-black text-white">
+                {user.credits}
               </span>
             </div>
-            <span className="text-lg font-heading font-black text-white">
-              {user.credits}
-            </span>
-          </Link>
+            <button
+              type="button"
+              onClick={() => setShowBuyCredits(true)}
+              className="w-full flex items-center justify-center gap-1.5 px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary-light text-[10px] font-bold uppercase tracking-widest transition-all"
+            >
+              <Plus className="w-3 h-3" />
+              Top Up
+            </button>
+          </div>
         </div>
 
         <nav className="flex-1 px-4 py-4 space-y-2">
@@ -171,6 +181,13 @@ export default function DashboardLayout({
       <main className="flex-1 lg:ml-64 pb-24 lg:pb-0 min-h-screen">
         {children}
       </main>
+
+      {/* Buy Credits Modal */}
+      <BuyCreditsModal
+        open={showBuyCredits}
+        onClose={() => setShowBuyCredits(false)}
+        onPurchased={() => refreshUser()}
+      />
     </div>
   );
 }
