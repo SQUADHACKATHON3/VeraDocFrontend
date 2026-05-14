@@ -19,7 +19,8 @@ import { useEffect, useState } from "react";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle2, Shield, ArrowRight } from "lucide-react";
+import Image from "next/image";
+import { CheckCircle2, ArrowRight } from "lucide-react";
 
 // Squad has used a few different names for the reference param over time —
 // read all the likely ones so we don't depend on a single spelling.
@@ -50,14 +51,15 @@ function CallbackContent() {
       <div className="relative w-full max-w-md glass p-6 sm:p-8 md:p-10 rounded-[2rem] sm:rounded-[3rem] space-y-6 text-center">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-foreground/40 hover:text-white transition-colors"
+          className="inline-flex items-center hover:opacity-80 transition-opacity"
         >
-          <div className="bg-primary p-1.5 rounded-lg">
-            <Shield className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-lg font-heading font-extrabold tracking-tight">
-            VeraDoc
-          </span>
+          <Image
+            src="/assets/veradoc_banner.png"
+            alt="VeraDoc"
+            width={590}
+            height={249}
+            className="h-7 w-auto"
+          />
         </Link>
 
         <div className="w-16 h-16 rounded-3xl bg-green-500/10 flex items-center justify-center text-green-500 mx-auto">

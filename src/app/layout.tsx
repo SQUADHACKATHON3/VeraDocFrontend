@@ -13,6 +13,15 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "VeraDoc | AI-Powered Certificate Verification",
   description: "Stop Trusting. Start Verifying. VeraDoc detects fake academic certificates and transcripts in seconds using advanced AI forensics.",
+  icons: {
+    icon: "/assets/favicon.ico",
+    apple: "/assets/veradoc_logo.png",
+  },
+  openGraph: {
+    title: "VeraDoc | AI-Powered Certificate Verification",
+    description: "Stop Trusting. Start Verifying. VeraDoc detects fake academic certificates and transcripts in seconds using advanced AI forensics.",
+    images: ["/assets/veradoc_banner.png"],
+  },
 };
 
 export default function RootLayout({

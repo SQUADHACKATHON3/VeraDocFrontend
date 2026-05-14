@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Shield, Menu, X } from "lucide-react";
+import Image from "next/image";
+import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,11 +20,15 @@ export default function Navbar() {
   return (
     <nav className={`fixed top-0 w-full z-50 bg-dark-bg border-b border-card-border transition-all duration-300 ${isScrolled ? "py-3" : "py-4"}`}>
       <div className="container mx-auto px-6 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="bg-primary p-1.5 rounded-lg group-hover:scale-110 transition-transform">
-            <Shield className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-2xl font-heading font-extrabold tracking-tight">VeraDoc</span>
+        <Link href="/" className="flex items-center group">
+          <Image
+            src="/assets/veradoc_banner.png"
+            alt="VeraDoc"
+            width={590}
+            height={249}
+            priority
+            className="h-9 w-auto group-hover:scale-105 transition-transform"
+          />
         </Link>
 
         {/* Desktop Nav */}

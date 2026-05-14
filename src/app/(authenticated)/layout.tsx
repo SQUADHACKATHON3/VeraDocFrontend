@@ -3,8 +3,8 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
-  Shield,
   LayoutDashboard,
   ShieldCheck,
   Clock,
@@ -59,13 +59,15 @@ export default function DashboardLayout({
       {/* Sidebar (Desktop) */}
       <aside className="hidden lg:flex w-64 flex-col fixed inset-y-0 border-r border-card-border bg-sidebar z-50">
         <div className="p-6">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="bg-primary p-1.5 rounded-lg">
-              <Shield className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-heading font-extrabold tracking-tight">
-              VeraDoc
-            </span>
+          <Link href="/" className="flex items-center group">
+            <Image
+              src="/assets/veradoc_banner.png"
+              alt="VeraDoc"
+              width={590}
+              height={249}
+              priority
+              className="h-8 w-auto group-hover:scale-105 transition-transform"
+            />
           </Link>
         </div>
 

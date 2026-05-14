@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { 
+import Image from "next/image";
+import {
   Shield, 
   Upload, 
   CreditCard, 
@@ -260,9 +261,14 @@ export default function LandingPage() {
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-12 mb-20">
             <div className="col-span-2">
-              <Link href="/" className="flex items-center gap-2 mb-6">
-                <Shield className="w-8 h-8 text-primary" />
-                <span className="text-2xl font-heading font-extrabold">VeraDoc</span>
+              <Link href="/" className="inline-flex items-center mb-6">
+                <Image
+                  src="/assets/veradoc_banner.png"
+                  alt="VeraDoc"
+                  width={590}
+                  height={249}
+                  className="h-9 w-auto"
+                />
               </Link>
               <p className="text-foreground/50 max-w-xs leading-relaxed">
                 AI-powered document trust for a more transparent educational ecosystem in Nigeria.
