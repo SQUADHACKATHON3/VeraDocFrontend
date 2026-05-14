@@ -2,26 +2,34 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/mongodb';
-import User from '@/models/User';
 import Verification from '@/models/Verification';
 
-export async function DELETE(request: Request) {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> } | { params: { id: string } }
+) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user || !session.user.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const resolvedParams = await Promise.resolve(params);
+    const id = resolvedParams.id;
+
     await dbConnect();
 
-    await Verification.deleteMany({ userId: session.user.id });
+    const verification = await Verification.findOne({
+      _id: id,
+      userId: session.user.id,
+    }).select('-fileBase64');
 
-    const deletedUser = await User.findByIdAndDelete(session.user.id);
-    if (!deletedUser) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    if (!verification) {
+      return NextResponse.json({ error: 'Verification not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ message: 'Account deleted' }, { status: 200 });
+    return NextResponse.json(verification, { status: 200 });
+
   } catch (error: any) {
     return NextResponse.json({ error: 'Internal server error', detail: error.message }, { status: 500 });
   }
