@@ -4,11 +4,11 @@
  * Squad checkout redirect target.
  *
  * Squad sends the customer's browser here after they finish (or abandon)
- * payment on the hosted checkout page. This page now actively polls the
- * backend for the purchase status using the `purchaseId` stored in
- * localStorage by `BuyCreditsModal`. Once the backend confirms the
- * purchase is `completed` (via the Squad webhook), it clears the pending
- * purchase and shows a success screen.
+ * payment on the hosted checkout page. This page calls
+ * `POST /api/credits/purchases/{id}/verify` with the `purchaseId` stored in
+ * localStorage by `BuyCreditsModal` — that endpoint asks Squad whether the
+ * payment cleared and grants credits if so. It's retried until the purchase
+ * settles to `completed`/`failed`, then the pending purchase is cleared.
  *
  * This is the critical fallback: even if the user closed the BuyCreditsModal
  * tab or refreshed the page, landing here will still pick up the pending
@@ -85,12 +85,12 @@ function CallbackContent() {
       return;
     }
 
-    // Start polling the purchase status every 3 seconds.
+    // Verify with Squad every 3 seconds until the purchase settles.
     setStatus("polling");
 
     const poll = async () => {
       try {
-        const res = await api.getPurchaseStatus(pending.purchaseId);
+        const res = await api.verifyPurchase(pending.purchaseId);
         if (res.status === "completed") {
           stopPolling();
           pendingPurchaseStore.clear();
@@ -100,7 +100,7 @@ function CallbackContent() {
           pendingPurchaseStore.clear();
           setStatus("failed");
         }
-        // "pending" → keep polling
+        // "pending" → Squad hasn't confirmed yet, keep retrying.
       } catch {
         // Transient error — keep polling.
       }

@@ -4,7 +4,7 @@
  * Credits purchase flow (Squad checkout).
  *
  *   pick a pack -> POST /api/credits/purchase/initiate -> open checkoutUrl
- *   -> poll GET /api/credits/purchases/{id} until completed/failed
+ *   -> poll POST /api/credits/purchases/{id}/verify until completed/failed
  *   -> refresh the user's balance.
  */
 
@@ -37,7 +37,7 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
       setPhase("awaiting");
       pollRef.current = setInterval(async () => {
         try {
-          const status = await api.getPurchaseStatus(purchaseId);
+          const status = await api.verifyPurchase(purchaseId);
           if (status.status === "completed") {
             stopPolling();
             pendingPurchaseStore.clear();

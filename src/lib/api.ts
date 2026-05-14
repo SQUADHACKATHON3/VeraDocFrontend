@@ -51,6 +51,16 @@ export type CreditPurchaseStatus = {
   credits: number;
 };
 
+export type CreditPurchaseVerify = {
+  purchaseId: string;
+  status: "pending" | "completed" | "failed";
+  credits: number;
+  /** Squad's answer: true if paid, false if not, null if it couldn't be reached. */
+  paymentConfirmed: boolean | null;
+  /** True when the purchase was already settled before this call. */
+  alreadyCompleted: boolean;
+};
+
 export type InitiateVerification = {
   verificationId: string;
   creditsRemaining: number;
@@ -338,6 +348,18 @@ export const api = {
   getPurchaseStatus(purchaseId: string) {
     return request<CreditPurchaseStatus>(
       `/api/credits/purchases/${purchaseId}`
+    );
+  },
+
+  /**
+   * Actively asks Squad whether the purchase was paid and grants credits if so.
+   * Idempotent — safe to call repeatedly (see `alreadyCompleted`). This is what
+   * settles a purchase; `getPurchaseStatus` only reads the stored state.
+   */
+  verifyPurchase(purchaseId: string) {
+    return request<CreditPurchaseVerify>(
+      `/api/credits/purchases/${purchaseId}/verify`,
+      { method: "POST" }
     );
   },
 
