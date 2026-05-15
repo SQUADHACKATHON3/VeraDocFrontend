@@ -24,8 +24,8 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { CheckCircle2, ArrowRight, Loader2, AlertTriangle } from "lucide-react";
+import Logo from "@/components/brand/Logo";
 import {
   api,
   pendingPurchaseStore,
@@ -121,18 +121,7 @@ function CallbackContent() {
   return (
     <div className="min-h-screen bg-canvas text-foreground font-sans flex items-center justify-center p-6">
       <div className="relative w-full max-w-md rounded-xl border border-border bg-surface-raised p-6 sm:p-8 md:p-10 rounded-[2rem] sm:rounded-[3rem] space-y-6 text-center">
-        <Link
-          href="/"
-          className="inline-flex items-center hover:opacity-80 transition-opacity"
-        >
-          <Image
-            src="/assets/veradoc_banner.png"
-            alt="VeraDoc"
-            width={590}
-            height={249}
-            className="h-7 w-auto"
-          />
-        </Link>
+        <Logo />
 
         {/* ── Polling / Waiting ── */}
         {status === "polling" && (
