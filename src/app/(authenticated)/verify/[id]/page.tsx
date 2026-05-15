@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import {
   ShieldCheck,
   ShieldAlert,
-  ShieldX,
   FileText,
   Download,
   ArrowLeft,
-  RotateCcw,
   CheckCircle2,
   XCircle,
   Mail,
@@ -20,14 +19,57 @@ import {
   Info,
   Loader2,
 } from "lucide-react";
-import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { api, ApiError, type VerificationDetail } from "@/lib/api";
+import { formatVerdict, forensicVerdictModifier } from "@/lib/verdict";
+import ForensicDetailSkeleton from "@/components/skeletons/ForensicDetailSkeleton";
+
+const FORENSIC_SIGNAL_COUNT = 8;
+
+function TrustGauge({ score }: { score: number }) {
+  const r = 46;
+  const c = 2 * Math.PI * r;
+  const clamped = Math.max(0, Math.min(100, score));
+  const offset = c - (clamped / 100) * c;
+
+  return (
+    <div className="vd-forensic-gauge-ring">
+      <svg viewBox="0 0 120 120" aria-hidden>
+        <circle
+          className="vd-gauge-track"
+          cx="60"
+          cy="60"
+          r={r}
+          fill="none"
+          strokeWidth="7"
+        />
+        <circle
+          className="vd-gauge-progress"
+          cx="60"
+          cy="60"
+          r={r}
+          fill="none"
+          strokeWidth="7"
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={offset}
+          transform="rotate(-90 60 60)"
+        />
+      </svg>
+      <div className="vd-forensic-gauge-center">
+        <span className="vd-forensic-gauge-value">{clamped}</span>
+        <span className="vd-forensic-gauge-label">Trust score</span>
+      </div>
+    </div>
+  );
+}
 
 export default function VerificationResultPage() {
   const { id } = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const router = useRouter();
+  const fromHistory = searchParams.get("from") === "history";
   const [data, setData] = useState<VerificationDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -54,94 +96,67 @@ export default function VerificationResultPage() {
     if (id) fetchResult();
   }, [id, router]);
 
+  const copyOutreach = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* clipboard unavailable */
+    }
+  };
+
   if (isLoading) {
-    return (
-      <div className="max-w-[760px] mx-auto p-6 md:p-10 lg:pt-20 space-y-8">
-        <div className="h-48 w-full bg-white/5 rounded-[3rem] animate-pulse" />
-        <div className="h-32 w-full bg-white/5 rounded-3xl animate-pulse" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="h-64 bg-white/5 rounded-3xl animate-pulse" />
-          <div className="h-64 bg-white/5 rounded-3xl animate-pulse" />
-        </div>
-      </div>
-    );
+    return <ForensicDetailSkeleton />;
   }
 
   if (!data) return null;
 
-  // Still processing / errored — no verdict yet.
   if (data.status !== "complete" || !data.verdict) {
     return (
-      <div className="max-w-[760px] mx-auto p-6 md:p-10 lg:pt-20">
-        <div className="glass p-12 rounded-[3rem] text-center space-y-6">
+      <div className="vd-forensic">
+        <div className="vd-card" style={{ padding: 48, textAlign: "center" }}>
           {data.status === "error" ? (
             <>
-              <div className="w-16 h-16 rounded-3xl bg-red-500/10 flex items-center justify-center text-red-500 mx-auto">
-                <XCircle className="w-8 h-8" />
-              </div>
-              <div className="space-y-2">
-                <h1 className="text-3xl font-heading font-black">
-                  Analysis failed
-                </h1>
-                <p className="text-foreground/50 font-medium">
-                  Something went wrong analyzing{" "}
-                  <span className="text-white">{data.documentName}</span>.
-                  Please contact support.
-                </p>
-              </div>
+              <XCircle
+                size={40}
+                style={{ color: "var(--fake)", margin: "0 auto 16px" }}
+              />
+              <h1 className="vd-verify-title" style={{ fontSize: 28 }}>
+                Analysis failed
+              </h1>
+              <p className="vd-verify-lead" style={{ margin: "12px auto 24px" }}>
+                Something went wrong analyzing{" "}
+                <strong>{data.documentName}</strong>. Please contact support.
+              </p>
             </>
           ) : (
             <>
-              <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
-              <div className="space-y-2">
-                <h1 className="text-3xl font-heading font-black">
-                  Still analyzing
-                </h1>
-                <p className="text-foreground/50 font-medium">
-                  This verification is still being processed. Check back in a
-                  moment.
-                </p>
-              </div>
+              <Loader2
+                size={40}
+                className="animate-spin"
+                style={{ color: "var(--forest)", margin: "0 auto 16px" }}
+              />
+              <h1 className="vd-verify-title" style={{ fontSize: 28 }}>
+                Still analysing
+              </h1>
+              <p className="vd-verify-lead" style={{ margin: "12px auto 24px" }}>
+                This verification is still being processed. Check back in a moment.
+              </p>
             </>
           )}
-          <Link
-            href="/history"
-            className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:text-primary-light transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to History
+          <Link href="/history" className="vd-btn-ghost">
+            <ArrowLeft size={16} />
+            Back to history
           </Link>
         </div>
       </div>
     );
   }
 
-  const getVerdictConfig = () => {
-    switch (data.verdict) {
-      case "AUTHENTIC":
-        return {
-          bg: "#052e16",
-          color: "#16A34A",
-          icon: ShieldCheck,
-        };
-      case "SUSPICIOUS":
-        return {
-          bg: "#1c1000",
-          color: "#D97706",
-          icon: ShieldAlert,
-        };
-      default:
-        return {
-          bg: "#1a0000",
-          color: "#DC2626",
-          icon: ShieldX,
-        };
-    }
-  };
-
-  const config = getVerdictConfig();
+  const verdictMod = forensicVerdictModifier(data.verdict);
   const trustScore = data.trustScore ?? 0;
   const hints = data.issuerContactHints;
-
   const verifiedDate = data.completedAt
     ? new Date(data.completedAt).toLocaleString()
     : new Date(data.createdAt).toLocaleString();
@@ -156,182 +171,149 @@ export default function VerificationResultPage() {
       )
     );
 
-  const copyOutreach = async () => {
-    if (!hints?.suggestedOutreachMessage) return;
-    try {
-      await navigator.clipboard.writeText(hints.suggestedOutreachMessage);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* clipboard unavailable — no-op */
-    }
+  const showIssuer =
+    hints &&
+    (hints.included ||
+      hints.suggestedOutreachMessage ||
+      hints.items.length > 0 ||
+      hints.note);
+
+  const reportQuery = fromHistory ? "?from=history&print=1" : "?print=1";
+
+  const openReport = () => {
+    window.open(`/verify/${id}/report${reportQuery}`, "_blank", "noopener,noreferrer");
   };
 
   return (
-    <div className="max-w-[760px] mx-auto p-6 md:p-10 lg:pt-20 space-y-8 pb-56 lg:pb-20">
-      {/* Verdict Banner */}
-      <div
-        className="w-full min-h-[80px] flex flex-col md:flex-row items-center justify-between px-6 py-4 md:py-0 border-l-[1px] rounded-lg reveal active"
-        style={{ 
-          backgroundColor: config.bg, 
-          borderColor: config.color,
-          borderLeftWidth: '1px'
-        }}
-      >
-        <div className="flex items-center gap-4">
-          <config.icon className="w-5 h-5 flex-shrink-0" style={{ color: config.color }} />
-          <div className="flex flex-col">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B7280]">
-              VERDICT
-            </span>
-            <span 
-              className="text-2xl md:text-[28px] font-bold leading-tight" 
-              style={{ color: config.color }}
-            >
-              {data.verdict}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4 mt-4 md:mt-0">
-          <div className="flex flex-col items-end">
-            <div className="flex items-baseline gap-1" style={{ color: config.color }}>
-              <span className="text-4xl md:text-[48px] font-extrabold leading-none">
-                {trustScore}
-              </span>
-              <span className="text-xl md:text-[24px] font-bold">%</span>
-            </div>
-            <span className="text-[10px] text-[#6B7280] font-bold uppercase tracking-wide">
-              Trust Score
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* AI Summary Card */}
-      <div
-        className="bg-[#0F1623] border border-[#1E2A3A] rounded-lg reveal active overflow-hidden"
-        style={{ transitionDelay: "100ms" }}
-      >
-        <div className="px-6 py-3 flex items-center justify-between border-b border-[#1E2A3A]">
-          <span className="text-[11px] font-semibold text-[#2563EB] uppercase tracking-widest">
-            AI SUMMARY
-          </span>
-          <span className="text-[11px] text-[#6B7280] font-medium">
-            {verifiedDate}
-          </span>
-        </div>
-        <div className="p-6 space-y-4">
-          <p className="text-[15px] text-white leading-[1.6] font-normal">
+    <div className="vd-forensic">
+      <header className={`vd-forensic-hero vd-forensic-hero--${verdictMod}`}>
+        <div className="vd-forensic-hero-body">
+          <p className="vd-forensic-hero-kicker">Verdict</p>
+          <h1 className="vd-forensic-hero-title">
+            {formatVerdict(data.verdict)}.
+          </h1>
+          <p className="vd-forensic-hero-lead">
             {data.summary || "No summary available for this verification."}
           </p>
-          <div className="flex items-center gap-2 text-[12px] text-[#6B7280]">
-            <FileText className="w-3.5 h-3.5" />
-            <span>{data.documentName}</span>
+          <div className="vd-forensic-hero-meta">
+            <div className="vd-forensic-file-pill">
+              <FileText size={13} strokeWidth={1.5} />
+              <span>{data.documentName}</span>
+            </div>
+            {timeToVerify ? (
+              <span className="vd-forensic-hero-meta-note">
+                Analysed in {timeToVerify} seconds
+              </span>
+            ) : null}
           </div>
         </div>
-        <div className="px-6 py-3 border-t border-[#1E2A3A]">
-          <p className="text-[11px] text-[#6B7280] italic leading-relaxed">
-            This is an AI screening result, not a legal confirmation. For high-stakes decisions, confirm directly with the issuing school or ministry.
+        <div className="vd-forensic-hero-gauge">
+          <TrustGauge score={trustScore} />
+          <p className="vd-forensic-signals">
+            {data.passedChecks.length} of{" "}
+            {Math.max(
+              data.passedChecks.length + data.flags.length,
+              FORENSIC_SIGNAL_COUNT
+            )}{" "}
+            signals consistent
           </p>
         </div>
+      </header>
+
+      <article className="vd-card vd-forensic-summary">
+        <div className="vd-forensic-summary-head">
+          <span className="vd-eyebrow">AI summary</span>
+          <span className="vd-forensic-summary-date">{verifiedDate}</span>
+        </div>
+        <div className="vd-forensic-summary-body">
+          <p>
+            {data.summary || "No summary available for this verification."}
+          </p>
+        </div>
+        <div className="vd-forensic-summary-foot">
+          <p>
+            This is an AI screening result, not a legal confirmation. For
+            high-stakes decisions, confirm directly with the issuing school or
+            ministry.
+          </p>
+        </div>
+      </article>
+
+      <div className="vd-forensic-grid">
+        <section className="vd-forensic-panel vd-forensic-panel--issues">
+          <h3 className="vd-forensic-panel-title">
+            <ShieldAlert size={18} strokeWidth={1.75} />
+            Issues found
+          </h3>
+          {data.flags.length > 0 ? (
+            <ul className="vd-forensic-flag-list">
+              {data.flags.map((flag, i) => (
+                <li key={i} className="vd-forensic-flag">
+                  <XCircle size={16} strokeWidth={2} />
+                  <span>{flag}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="vd-forensic-empty">
+              <CheckCircle2 size={18} />
+              <span>No issues detected</span>
+            </div>
+          )}
+        </section>
+
+        <section className="vd-forensic-panel vd-forensic-panel--passed">
+          <h3 className="vd-forensic-panel-title">
+            <ShieldCheck size={18} strokeWidth={1.75} />
+            Passed checks
+          </h3>
+          {data.passedChecks.length > 0 ? (
+            <ul className="vd-forensic-pass-list">
+              {data.passedChecks.map((check, i) => (
+                <li key={i} className="vd-forensic-pass">
+                  <CheckCircle2 size={16} strokeWidth={2} />
+                  <span>{check}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="vd-forensic-issuer-note" style={{ margin: 0 }}>
+              No checks recorded.
+            </p>
+          )}
+        </section>
       </div>
 
-      {/* Checks Grid */}
-      <div
-        className="grid grid-cols-1 md:grid-cols-2 gap-6 reveal active"
-        style={{ transitionDelay: "200ms" }}
-      >
-        {/* Flags */}
-        <div className="glass p-8 rounded-[2.5rem] space-y-6">
-          <div className="flex items-center gap-3 mb-2">
-            <ShieldAlert className="w-5 h-5 text-red-500" />
-            <h3 className="text-xl font-heading font-bold">Issues Found</h3>
-          </div>
-          <div className="space-y-3">
-            {data.flags.length > 0 ? (
-              data.flags.map((flag, i) => (
-                <div
-                  key={i}
-                  className="flex items-start gap-3 p-3 rounded-xl bg-red-500/5 border border-red-500/10 text-red-500"
-                >
-                  <XCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm font-bold leading-tight">
-                    {flag}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-green-500/5 border border-green-500/10 text-green-500">
-                <CheckCircle2 className="w-5 h-5" />
-                <span className="text-sm font-bold">No issues detected</span>
-              </div>
-            )}
-          </div>
-        </div>
+      {showIssuer && hints && (
+        <article className="vd-card vd-forensic-issuer">
+          <h3 className="vd-forensic-issuer-title">
+            <Info size={18} strokeWidth={1.75} />
+            Confirm with the issuer
+          </h3>
 
-        {/* Passed Checks */}
-        <div className="glass p-8 rounded-[2.5rem] space-y-6">
-          <div className="flex items-center gap-3 mb-2">
-            <ShieldCheck className="w-5 h-5 text-green-500" />
-            <h3 className="text-xl font-heading font-bold">Passed Checks</h3>
-          </div>
-          <div className="space-y-3">
-            {data.passedChecks.length > 0 ? (
-              data.passedChecks.map((check, i) => (
-                <div
-                  key={i}
-                  className="flex items-start gap-3 p-3 rounded-xl bg-green-500/5 border border-green-500/10 text-green-500"
-                >
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm font-bold leading-tight">
-                    {check}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm font-medium text-foreground/30 italic">
-                No checks recorded.
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
+          {hints.disclaimer && (
+            <div className="vd-forensic-notice">{hints.disclaimer}</div>
+          )}
 
-      {/* Issuer Contact Hints */}
-      {hints && hints.included && (
-        <div
-          className="glass p-8 rounded-[2.5rem] space-y-6 reveal active"
-          style={{ transitionDelay: "250ms" }}
-        >
-          <div className="flex items-center gap-3">
-            <Info className="w-5 h-5 text-amber-500" />
-            <h3 className="text-xl font-heading font-bold">
-              Confirm With the Issuer
-            </h3>
-          </div>
-
-          <div className="bg-amber-500/10 border border-amber-500/20 text-amber-500/90 p-4 rounded-2xl text-xs font-medium leading-relaxed">
-            {hints.disclaimer}
-          </div>
-
-          {/* Contact items */}
           {hints.items.length > 0 ? (
-            <div className="space-y-3">
+            <ul className="vd-forensic-flag-list" style={{ marginBottom: 18 }}>
               {hints.items.map((item, i) => (
-                <div
+                <li
                   key={i}
-                  className="flex items-start gap-3 p-4 rounded-xl bg-white/5 border border-white/5"
+                  className="vd-forensic-pass"
+                  style={{
+                    background: "var(--paper)",
+                    borderColor: "var(--hairline)",
+                    color: "var(--ink)",
+                  }}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-foreground/40 flex-shrink-0">
-                    {item.type === "email" ? (
-                      <Mail className="w-4 h-4" />
-                    ) : (
-                      <Phone className="w-4 h-4" />
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-bold text-white break-all">
+                  {item.type === "email" ? (
+                    <Mail size={16} />
+                  ) : (
+                    <Phone size={16} />
+                  )}
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <p style={{ margin: 0, fontWeight: 500, wordBreak: "break-all" }}>
                       {item.value}
                     </p>
                     {item.sourceUrl && (
@@ -339,184 +321,128 @@ export default function VerificationResultPage() {
                         href={item.sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:text-primary-light transition-colors mt-1"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                          marginTop: 4,
+                          fontSize: 11,
+                          fontWeight: 600,
+                          color: "var(--forest)",
+                          textDecoration: "none",
+                        }}
                       >
-                        <ExternalLink className="w-3 h-3" />
+                        <ExternalLink size={12} />
                         {item.sourceTitle || "Source"}
                       </a>
                     )}
                   </div>
-                  <span className="text-[9px] font-black uppercase tracking-wider text-foreground/30 bg-white/5 px-2 py-1 rounded-full">
-                    Unverified
-                  </span>
-                </div>
+                  <span className="vd-eyebrow">Unverified</span>
+                </li>
               ))}
-            </div>
+            </ul>
           ) : (
-            <p className="text-sm font-medium text-foreground/30 italic">
+            <p className="vd-forensic-issuer-note">
               {hints.note === "no_contacts_found_in_snippets"
                 ? "No issuer contact details were found in web snippets."
                 : "No contact details available."}
             </p>
           )}
 
-          {/* Suggested outreach message */}
           {hints.suggestedOutreachMessage && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-foreground/40 uppercase tracking-[0.2em]">
-                  Draft Outreach Message
-                </span>
+            <div>
+              <div className="vd-forensic-outreach-head">
+                <span className="vd-eyebrow">Draft outreach message</span>
                 <button
                   type="button"
-                  onClick={copyOutreach}
-                  className="inline-flex items-center gap-1.5 text-[11px] font-bold text-primary hover:text-primary-light transition-colors"
+                  className="vd-forensic-outreach-copy"
+                  onClick={() => copyOutreach(hints.suggestedOutreachMessage!)}
                 >
                   {copied ? (
                     <>
-                      <Check className="w-3.5 h-3.5" /> Copied
+                      <Check size={14} />
+                      Copied
                     </>
                   ) : (
                     <>
-                      <Copy className="w-3.5 h-3.5" /> Copy
+                      <Copy size={14} />
+                      Copy
                     </>
                   )}
                 </button>
               </div>
-              <pre className="bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-foreground/80 font-sans whitespace-pre-wrap leading-relaxed">
+              <pre className="vd-forensic-outreach-body">
                 {hints.suggestedOutreachMessage}
               </pre>
               {hints.suggestedOutreachMessageNote && (
-                <p className="text-[11px] font-medium text-foreground/30 leading-relaxed">
+                <p
+                  className="vd-forensic-issuer-note"
+                  style={{ marginTop: 10, marginBottom: 0 }}
+                >
                   {hints.suggestedOutreachMessageNote}
                 </p>
               )}
             </div>
           )}
-        </div>
+        </article>
       )}
 
-      {/* Verification Details */}
-      <div
-        className="glass p-8 rounded-[2.5rem] reveal active"
-        style={{ transitionDelay: "300ms" }}
-      >
-        <h3 className="text-xl font-heading font-bold mb-8">
-          Verification Details
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
-          {[
-            { label: "Document Name", value: data.documentName },
-            { label: "Date Verified", value: verifiedDate },
-            {
-              label: "Time to Verify",
-              value: timeToVerify ? `${timeToVerify} seconds` : "—",
-            },
-            {
-              label: "Payment Ref",
-              value: data.squadTransactionRef || "Paid with credits",
-            },
-            {
-              label: "Verified By",
-              value: user
-                ? `${user.name} (${user.organisation})`
-                : "—",
-            },
-            { label: "Verification ID", value: data.id },
-          ].map((item, i) => (
-            <div key={i} className="space-y-1">
-              <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-[0.2em]">
-                {item.label}
-              </p>
-              <p className="text-sm font-bold text-white truncate">
-                {item.value}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
+      <article className="vd-card vd-forensic-details">
+        <h3>Verification details</h3>
+        <dl className="vd-forensic-meta">
+          <div>
+            <dt>Document name</dt>
+            <dd>{data.documentName}</dd>
+          </div>
+          <div>
+            <dt>Date verified</dt>
+            <dd>{verifiedDate}</dd>
+          </div>
+          <div>
+            <dt>Time to verify</dt>
+            <dd>{timeToVerify ? `${timeToVerify} seconds` : "—"}</dd>
+          </div>
+          <div>
+            <dt>Payment ref</dt>
+            <dd>{data.squadTransactionRef || "Paid with credits"}</dd>
+          </div>
+          <div>
+            <dt>Verified by</dt>
+            <dd>
+              {user ? `${user.name} (${user.organisation})` : "—"}
+            </dd>
+          </div>
+          <div>
+            <dt>Verification ID</dt>
+            <dd>{data.id}</dd>
+          </div>
+        </dl>
+      </article>
 
-      {/* Action Bar */}
-      <div
-        className="fixed bottom-[72px] left-0 right-0 lg:static lg:bottom-auto bg-dark-bg lg:bg-transparent border-t lg:border-none border-card-border p-6 lg:p-0 flex flex-col md:flex-row items-center justify-between gap-4 z-40 reveal active"
-        style={{ transitionDelay: "400ms" }}
-      >
-        <Link
-          href="/history"
-          className="flex items-center gap-2 text-sm font-bold text-foreground/40 hover:text-white transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to History
-        </Link>
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white px-8 py-4 rounded-2xl font-bold transition-all hover:scale-[1.02]"
-          >
-            <Download className="w-5 h-5" />
-            Download Report
-          </button>
+      <div className="vd-forensic-actions-bar">
+        <nav className="vd-forensic-toolbar" aria-label="Report actions">
           <Link
-            href="/verify"
-            className="flex items-center justify-center gap-2 text-foreground/60 hover:text-white px-4 py-2 font-bold transition-all text-sm"
+            href={fromHistory ? "/history" : "/dashboard"}
+            className="vd-btn-pill vd-btn-pill-light"
           >
-            <RotateCcw className="w-4 h-4" />
-            Run Another
+            <ArrowLeft size={16} />
+            {fromHistory ? "Back to history" : "Back to dashboard"}
           </Link>
-        </div>
+          <div className="vd-forensic-toolbar-actions">
+            <Link href="/verify" className="vd-btn-pill vd-btn-pill-light">
+              Run another
+            </Link>
+            <button
+              type="button"
+              onClick={openReport}
+              className="vd-btn-pill vd-btn-pill-dark"
+            >
+              <Download size={16} />
+              Download report
+            </button>
+          </div>
+        </nav>
       </div>
-
-      {/* Print Styles */}
-      <style jsx global>{`
-        @media print {
-          .glass,
-          .lg\\:static {
-            background: white !important;
-            color: black !important;
-            border: 1px solid #eee !important;
-            box-shadow: none !important;
-            backdrop-filter: none !important;
-          }
-          aside,
-          nav,
-          .fixed,
-          .hidden,
-          .lg\\:ml-64 {
-            display: none !important;
-          }
-          .max-w-\\[760px\\] {
-            max-width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-          main {
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-          h1,
-          h2,
-          h3,
-          p,
-          span,
-          pre {
-            color: black !important;
-          }
-          .text-primary,
-          .text-green-500,
-          .text-red-500,
-          .text-amber-500 {
-            color: black !important;
-            font-weight: bold !important;
-          }
-          .bg-green-500\\/10,
-          .bg-red-500\\/10,
-          .bg-amber-500\\/10 {
-            background: transparent !important;
-            border: 1px solid #ddd !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }

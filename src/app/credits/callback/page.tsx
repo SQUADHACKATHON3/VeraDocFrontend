@@ -119,8 +119,8 @@ function CallbackContent() {
   }, [stopPolling]);
 
   return (
-    <div className="min-h-screen bg-dark-bg text-foreground font-sans flex items-center justify-center p-6">
-      <div className="relative w-full max-w-md glass p-6 sm:p-8 md:p-10 rounded-[2rem] sm:rounded-[3rem] space-y-6 text-center">
+    <div className="min-h-screen bg-canvas text-foreground font-sans flex items-center justify-center p-6">
+      <div className="relative w-full max-w-md rounded-xl border border-border bg-surface-raised p-6 sm:p-8 md:p-10 rounded-[2rem] sm:rounded-[3rem] space-y-6 text-center">
         <Link
           href="/"
           className="inline-flex items-center hover:opacity-80 transition-opacity"
@@ -137,22 +137,22 @@ function CallbackContent() {
         {/* ── Polling / Waiting ── */}
         {status === "polling" && (
           <>
-            <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
+            <Loader2 className="w-12 h-12 animate-spin text-forest mx-auto" />
             <div className="space-y-2">
               <h1 className="text-3xl font-heading font-black">
                 Confirming payment
               </h1>
-              <p className="text-foreground/50 font-medium text-sm">
+              <p className="text-ink-secondary font-medium text-sm">
                 We&apos;re verifying your payment with Squad. This usually takes
                 a few seconds. Please don&apos;t close this page.
               </p>
             </div>
             {reference && (
-              <div className="bg-card border border-card-border rounded-2xl p-4">
+              <div className="bg-card border border-border rounded-2xl p-4">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/40 mb-1">
                   Transaction reference
                 </p>
-                <p className="font-mono text-sm text-white break-all">
+                <p className="font-mono text-sm text-ink break-all">
                   {reference}
                 </p>
               </div>
@@ -170,17 +170,17 @@ function CallbackContent() {
               <h1 className="text-3xl font-heading font-black">
                 Credits added!
               </h1>
-              <p className="text-foreground/50 font-medium text-sm">
+              <p className="text-ink-secondary font-medium text-sm">
                 Your payment was confirmed and credits have been deposited to
                 your account. You&apos;re good to verify.
               </p>
             </div>
             {reference && (
-              <div className="bg-card border border-card-border rounded-2xl p-4">
+              <div className="bg-card border border-border rounded-2xl p-4">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/40 mb-1">
                   Transaction reference
                 </p>
-                <p className="font-mono text-sm text-white break-all">
+                <p className="font-mono text-sm text-ink break-all">
                   {reference}
                 </p>
               </div>
@@ -198,7 +198,7 @@ function CallbackContent() {
               <h1 className="text-3xl font-heading font-black">
                 Payment didn&apos;t go through
               </h1>
-              <p className="text-foreground/50 font-medium text-sm">
+              <p className="text-ink-secondary font-medium text-sm">
                 The payment was not confirmed. No credits were deducted. You can
                 try again from the dashboard.
               </p>
@@ -216,17 +216,17 @@ function CallbackContent() {
               <h1 className="text-3xl font-heading font-black">
                 Payment received
               </h1>
-              <p className="text-foreground/50 font-medium text-sm">
+              <p className="text-ink-secondary font-medium text-sm">
                 Your credits should appear automatically in your account. Head
                 back to the dashboard to check your balance.
               </p>
             </div>
             {reference && (
-              <div className="bg-card border border-card-border rounded-2xl p-4">
+              <div className="bg-card border border-border rounded-2xl p-4">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/40 mb-1">
                   Transaction reference
                 </p>
-                <p className="font-mono text-sm text-white break-all">
+                <p className="font-mono text-sm text-ink break-all">
                   {reference}
                 </p>
               </div>
@@ -244,7 +244,7 @@ function CallbackContent() {
               <h1 className="text-3xl font-heading font-black">
                 Session expired
               </h1>
-              <p className="text-foreground/50 font-medium text-sm">
+              <p className="text-ink-secondary font-medium text-sm">
                 Please log in again to verify your payment. Your credits will be
                 deposited automatically once the payment is confirmed.
               </p>
@@ -258,7 +258,7 @@ function CallbackContent() {
             <button
               type="button"
               onClick={() => window.close()}
-              className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full bg-forest hover:bg-forest-mid text-ink font-bold py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               Close this tab
             </button>
@@ -267,8 +267,8 @@ function CallbackContent() {
             href={status === "no_auth" ? "/auth/login" : "/dashboard"}
             className={`w-full font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-3 ${
               canClose && status !== "polling"
-                ? "text-foreground/40 hover:text-white"
-                : "bg-primary hover:bg-primary-hover text-white hover:scale-[1.02] active:scale-[0.98]"
+                ? "text-foreground/40 hover:text-ink"
+                : "bg-forest hover:bg-forest-mid text-ink hover:scale-[1.02] active:scale-[0.98]"
             }`}
           >
             {status === "no_auth" ? "Log in" : "Back to VeraDoc"}{" "}

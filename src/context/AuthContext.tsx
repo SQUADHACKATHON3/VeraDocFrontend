@@ -22,13 +22,13 @@ import { api, tokenStore, type Me } from "@/lib/api";
 type AuthContextValue = {
   user: Me | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<Me>;
   register: (input: {
     name: string;
     organisation: string;
     email: string;
     password: string;
-  }) => Promise<void>;
+  }) => Promise<{ devOtp?: string }>;
   logout: () => void;
   /** Re-fetch the profile — call after a credit purchase or a verification. */
   refreshUser: () => Promise<void>;
@@ -81,6 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     tokenStore.set(tokens);
     const me = await api.me();
     setUser(me);
+    return me;
   }, []);
 
   const register = useCallback(
@@ -90,8 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email: string;
       password: string;
     }) => {
-      await api.register(input);
-      // Backend has no auto-login — sign in with the same credentials.
+      const reg = await api.register(input);
       const tokens = await api.login({
         email: input.email,
         password: input.password,
@@ -99,6 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       tokenStore.set(tokens);
       const me = await api.me();
       setUser(me);
+      return { devOtp: reg.devOtp };
     },
     []
   );
