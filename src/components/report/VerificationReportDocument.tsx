@@ -77,8 +77,13 @@ export default function VerificationReportDocument({
   return (
     <article className={`vd-pdf-report vd-pdf-report--${verdictMod}`}>
       <header className="vd-pdf-header">
-        <div className="vd-pdf-brand">
-          <span className="vd-logo">
+        <div className="vd-pdf-brand" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <img
+            src="/assets/veradoc_logo.png"
+            alt="VeraDoc"
+            style={{ height: '30px', width: 'auto' }}
+          />
+          <span className="vd-logo" style={{ fontSize: '24px' }}>
             Vera<em>Doc</em>
           </span>
         </div>

@@ -455,15 +455,11 @@
   flex-shrink: 0;
 }
 
-.vd-logo-light {
-  font-family: var(--serif);
-  font-size: 20px;
-  letter-spacing: -0.02em;
+.vd-logo-light .vd-logo {
   color: var(--paper-2);
 }
 
-.vd-logo-light em {
-  font-style: italic;
+.vd-logo-light .vd-logo em {
   color: var(--ink-4);
 }
 

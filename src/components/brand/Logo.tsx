@@ -1,15 +1,31 @@
 import Link from "next/link";
+import Image from "next/image";
 
 type LogoProps = {
   href?: string;
   className?: string;
+  height?: number;
 };
 
-export default function Logo({ href = "/", className }: LogoProps) {
+export default function Logo({ href = "/", className, height = 28 }: LogoProps) {
   const mark = (
-    <span className={`vd-logo${className ? ` ${className}` : ""}`}>
-      Vera<em>Doc</em>
-    </span>
+    <div className={`vd-logo-container${className ? ` ${className}` : ""}`} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <Image
+        src="/assets/veradoc_logo.png"
+        alt="VeraDoc"
+        width={height}
+        height={height}
+        style={{ 
+          height: `${height}px`, 
+          width: 'auto',
+          filter: className?.includes('vd-logo-light') ? 'brightness(0) invert(1)' : undefined
+        }}
+        priority
+      />
+      <span className="vd-logo" style={{ fontSize: `${height * 0.8}px` }}>
+        Vera<em>Doc</em>
+      </span>
+    </div>
   );
 
   if (href) {

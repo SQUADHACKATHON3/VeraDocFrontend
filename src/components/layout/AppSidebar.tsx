@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
+import Logo from "@/components/brand/Logo";
 import { isNavItemActive } from "@/lib/app-nav";
 import {
   LayoutDashboard,
@@ -45,12 +46,9 @@ export default function AppSidebar({
 
   return (
     <aside className="vd-sidebar">
-      <Link href="/dashboard" className="vd-sidebar-brand">
-        <ShieldCheck size={20} strokeWidth={1.5} />
-        <span className="vd-logo">
-          Vera<em>Doc</em>
-        </span>
-      </Link>
+      <div className="vd-sidebar-brand">
+        <Logo height={24} />
+      </div>
 
       <div className="vd-credits-box">
         <div className="vd-credits-box-header">

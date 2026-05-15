@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShieldCheck } from "lucide-react";
+import Logo from "@/components/brand/Logo";
 
 const STATS = [
   { value: "10,000+", label: "Documents verified" },
@@ -10,12 +10,9 @@ const STATS = [
 export default function AuthAside() {
   return (
     <aside className="vd-auth-panel">
-      <Link href="/" className="vd-auth-panel-brand">
-        <ShieldCheck size={22} strokeWidth={1.5} />
-        <span className="vd-logo-light">
-          Vera<em>Doc</em>
-        </span>
-      </Link>
+      <div className="vd-auth-panel-brand">
+        <Logo height={24} className="vd-logo-light" />
+      </div>
 
       <div className="vd-auth-panel-body">
         <p className="vd-eyebrow vd-eyebrow-on-dark">From the field</p>

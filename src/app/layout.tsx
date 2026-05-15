@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   description:
     "Stop trusting. Start verifying. VeraDoc detects fake academic certificates and transcripts in seconds using advanced AI forensics.",
   icons: {
-    icon: "/assets/favicon.ico",
+    icon: "/assets/veradoc_logo.png",
     apple: "/assets/veradoc_logo.png",
   },
   openGraph: {
