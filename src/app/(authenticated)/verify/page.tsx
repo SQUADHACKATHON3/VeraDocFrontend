@@ -90,8 +90,13 @@ export default function VerifyPage() {
         setFile(pendingFile);
         const params = new URLSearchParams(window.location.search);
         if (params.get("payment") === "success") {
-          // Auto-start if we just came back from payment
+          // Wait a beat for the backend to sync credits, then refresh user
+          await new Promise(r => setTimeout(r, 1000));
+          await refreshUser();
           start(pendingFile);
+          
+          // Clean up URL so we don't re-trigger on refresh
+          window.history.replaceState({}, "", window.location.pathname);
         }
       }
     };
@@ -148,11 +153,13 @@ export default function VerifyPage() {
       setCheckIdx(0);
       setStep(3);
     } catch (err) {
-      if (err instanceof ApiError && err.status === 402) setShowBuy(true);
-      else
-        setError(
-          err instanceof ApiError ? err.message : "Could not start verification."
-        );
+      console.error("Verification failed:", err);
+      if (err instanceof ApiError && err.status === 402) {
+        setShowBuy(true);
+      } else {
+        const msg = err instanceof ApiError ? err.message : "Could not start verification. Please try again.";
+        setError(msg);
+      }
     } finally {
       setBusy(false);
     }
