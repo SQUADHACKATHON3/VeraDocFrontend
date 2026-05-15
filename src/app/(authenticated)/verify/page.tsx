@@ -146,11 +146,12 @@ export default function VerifyPage() {
     if (!targetFile) return;
 
     // Reconstruct File object if it's not a proper File instance (e.g. after IDB retrieval)
-    if (!(targetFile instanceof File)) {
+    if (!((targetFile as any) instanceof File)) {
       console.log("Reconstructing file object...", targetFile);
-      const blobData = targetFile instanceof Blob ? targetFile : new Blob([targetFile as any]);
-      targetFile = new File([blobData], (targetFile as any).name || "document.pdf", {
-        type: (targetFile as any).type || "application/pdf",
+      const _f = targetFile as any;
+      const blobData = _f instanceof Blob ? _f : new Blob([_f]);
+      targetFile = new File([blobData], _f.name || "document.pdf", {
+        type: _f.type || "application/pdf",
       });
     }
 
