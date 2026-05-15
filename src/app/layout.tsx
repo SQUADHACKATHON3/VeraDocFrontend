@@ -30,13 +30,21 @@ export const metadata: Metadata = {
     "Stop trusting. Start verifying. VeraDoc detects fake academic certificates and transcripts in seconds using advanced AI forensics.",
   icons: {
     icon: "/assets/veradoc_logo.png",
+    shortcut: "/assets/veradoc_logo.png",
     apple: "/assets/veradoc_logo.png",
   },
   openGraph: {
     title: "VeraDoc | AI-Powered Certificate Verification",
     description:
       "Stop trusting. Start verifying. VeraDoc detects fake academic certificates and transcripts in seconds.",
-    images: ["/assets/veradoc_banner.png"],
+    images: ["/assets/veradoc_logo.png"],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "VeraDoc | AI-Powered Certificate Verification",
+    description: "Stop trusting. Start verifying. VeraDoc detects fake academic certificates and transcripts in seconds.",
+    images: ["/assets/veradoc_logo.png"],
   },
 };
 

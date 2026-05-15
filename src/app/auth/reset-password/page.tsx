@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { api } from "@/lib/api";
-import { Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { Loader2, Eye, EyeOff, CheckCircle2, ArrowRight } from "lucide-react";
 import Logo from "@/components/brand/Logo";
 import Link from "next/link";
 
@@ -128,15 +128,15 @@ export default function ResetPasswordPage() {
   if (isSuccess) {
     return (
       <div className="min-h-screen bg-canvas flex items-center justify-center p-6 font-sans">
-        <div className="w-full max-w-md rounded-xl border border-border bg-surface-raised p-8 md:p-10 rounded-[2.5rem] border border-border  text-center">
-          <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+        <div className="w-full max-w-md rounded-xl border border-border bg-surface-raised p-8 md:p-10 rounded-[2.5rem] border border-border shadow-2xl text-center">
+          <div className="w-16 h-16 bg-forest/10 border border-forest/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle2 className="w-8 h-8 text-forest" />
           </div>
-          <h1 className="text-2xl font-bold text-ink mb-2">Password reset successfully.</h1>
+          <h1 className="vd-auth-title">Password reset <em>successfully.</em></h1>
           <p className="text-ink-secondary mb-8 font-medium">You can now sign in with your new password.</p>
           <Link 
             href="/auth/login"
-            className="w-full bg-forest hover:bg-forest-mid text-ink font-bold py-4 rounded-2xl transition-all block text-center"
+            className="vd-btn-pill vd-btn-pill-dark vd-btn-pill--full"
           >
             Sign In →
           </Link>
@@ -149,10 +149,10 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-canvas text-foreground font-sans selection:bg-primary/30">
       <div className="p-6"><Logo /></div>
 
-      <main className="flex flex-col items-center justify-center p-6 pt-32 lg:pt-40">
-        <div className="w-full max-w-md rounded-xl border border-border bg-surface-raised p-8 md:p-10 rounded-[2.5rem] border border-border  reveal active">
+      <main className="flex flex-col items-center justify-center p-6 pt-12 lg:pt-20">
+        <div className="w-full max-w-md rounded-xl border border-border bg-surface-raised p-8 md:p-10 rounded-[2.5rem] border border-border shadow-2xl reveal active">
           <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-ink mb-3 tracking-tight">Enter your reset code.</h1>
+            <h1 className="vd-auth-title">Enter your <em>reset code.</em></h1>
             <p className="text-ink-secondary text-sm font-medium leading-relaxed">
               Check your email for the 6-digit reset code.
             </p>
@@ -171,14 +171,14 @@ export default function ResetPasswordPage() {
                   onChange={e => handleChange(index, e.target.value)}
                   onKeyDown={e => handleKeyDown(index, e)}
                   onPaste={handlePaste}
-                  className="w-12 h-14 bg-card border border-border focus:border-primary rounded-xl text-center text-xl font-bold text-ink outline-none transition-all"
+                  className="w-12 h-14 bg-card border border-border focus:border-forest rounded-xl text-center text-xl font-bold text-ink outline-none transition-all focus:ring-2 focus:ring-forest/10"
                 />
               ))}
             </div>
 
             <div className={`space-y-6 transition-all duration-500 overflow-hidden ${isOtpComplete ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'}`}>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/40 ml-1">New Password</label>
+              <div className="vd-field">
+                <label className="vd-field-label ml-1">New Password</label>
                 <div className="relative">
                   <input
                     {...register("newPassword", { 
@@ -187,7 +187,7 @@ export default function ResetPasswordPage() {
                     })}
                     type={showPassword ? "text" : "password"}
                     disabled={isLoading}
-                    className={`w-full bg-card border ${errors.newPassword ? 'border-red-500' : 'border-border'} focus:border-primary rounded-xl px-5 py-3.5 outline-none transition-all font-medium text-ink text-sm`}
+                    className={`vd-input${errors.newPassword ? ' vd-input-error' : ''}`}
                     placeholder="••••••••"
                   />
                   <button
@@ -198,11 +198,11 @@ export default function ResetPasswordPage() {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                {errors.newPassword && <p className="text-red-500 text-[10px] mt-1 ml-1 font-medium">{errors.newPassword.message as string}</p>}
+                {errors.newPassword && <p className="vd-field-error ml-1">{errors.newPassword.message as string}</p>}
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/40 ml-1">Confirm Password</label>
+              <div className="vd-field">
+                <label className="vd-field-label ml-1">Confirm Password</label>
                 <input
                   {...register("confirmPassword", { 
                     required: "Please confirm your password",
@@ -210,10 +210,10 @@ export default function ResetPasswordPage() {
                   })}
                   type={showPassword ? "text" : "password"}
                   disabled={isLoading}
-                  className={`w-full bg-card border ${errors.confirmPassword ? 'border-red-500' : 'border-border'} focus:border-primary rounded-xl px-5 py-3.5 outline-none transition-all font-medium text-ink text-sm`}
+                  className={`vd-input${errors.confirmPassword ? ' vd-input-error' : ''}`}
                   placeholder="••••••••"
                 />
-                {errors.confirmPassword && <p className="text-red-500 text-[10px] mt-1 ml-1 font-medium">{errors.confirmPassword.message as string}</p>}
+                {errors.confirmPassword && <p className="vd-field-error ml-1">{errors.confirmPassword.message as string}</p>}
               </div>
             </div>
 
@@ -221,7 +221,7 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={!isOtpComplete || !!errors.newPassword || !!errors.confirmPassword || !newPassword || isLoading}
-                className="w-full bg-forest hover:bg-forest-mid disabled:bg-primary/50 text-ink font-bold py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+                className="vd-btn-pill vd-btn-pill-dark vd-btn-pill--full"
               >
                 {isLoading ? (
                   <>
@@ -229,7 +229,10 @@ export default function ResetPasswordPage() {
                     <span>Resetting...</span>
                   </>
                 ) : (
-                  <span>Reset Password</span>
+                  <>
+                    <span>Reset Password</span>
+                    <ArrowRight className="w-5 h-5" />
+                  </>
                 )}
               </button>
 

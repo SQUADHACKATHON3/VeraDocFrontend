@@ -5,11 +5,12 @@ type LogoProps = {
   href?: string;
   className?: string;
   height?: number;
+  center?: boolean;
 };
 
-export default function Logo({ href = "/", className, height = 28 }: LogoProps) {
+export default function Logo({ href = "/", className, height = 28, center }: LogoProps) {
   const mark = (
-    <div className={`vd-logo-container${className ? ` ${className}` : ""}`} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <div className={`vd-logo-container${className ? ` ${className}` : ""}`} style={{ display: 'flex', alignItems: 'center', justifyContent: center ? 'center' : 'flex-start', gap: '8px' }}>
       <Image
         src="/assets/veradoc_logo.png"
         alt="VeraDoc"
