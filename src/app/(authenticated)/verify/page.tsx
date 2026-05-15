@@ -13,9 +13,10 @@ import {
   Check,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { api, ApiError, formatNaira, type VerificationStatusOut } from "@/lib/api";
+import { api, ApiError, formatNaira, pendingPurchaseStore, type VerificationStatusOut } from "@/lib/api";
 import BuyCreditsModal from "@/components/BuyCreditsModal";
 import { formatVerdict, verdictPillClass } from "@/lib/verdict";
+import { idbStore } from "@/lib/idb";
 
 const ALLOWED = ["application/pdf", "image/jpeg", "image/png"];
 const MAX = 5 * 1024 * 1024;
@@ -83,6 +84,21 @@ export default function VerifyPage() {
   }, [file, step]);
 
   useEffect(() => {
+    const resume = async () => {
+      const pendingFile = await idbStore.getFile();
+      if (pendingFile) {
+        setFile(pendingFile);
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("payment") === "success") {
+          // Auto-start if we just came back from payment
+          start(pendingFile);
+        }
+      }
+    };
+    resume();
+  }, []);
+
+  useEffect(() => {
     if (step !== 3 || !vid) return;
     const tick = setInterval(
       () => setCheckIdx((i) => Math.min(i + 1, FORENSIC_CHECKS.length)),
@@ -119,14 +135,16 @@ export default function VerifyPage() {
     setFile(f);
   };
 
-  const start = async () => {
-    if (!file) return;
+  const start = async (f?: File) => {
+    const targetFile = f || file;
+    if (!targetFile) return;
     setBusy(true);
     setError(null);
     try {
-      const res = await api.initiateVerification(file);
+      const res = await api.initiateVerification(targetFile);
       setVid(res.verificationId);
       await refreshUser();
+      await idbStore.clearFile();
       setCheckIdx(0);
       setStep(3);
     } catch (err) {
@@ -136,6 +154,26 @@ export default function VerifyPage() {
           err instanceof ApiError ? err.message : "Could not start verification."
         );
     } finally {
+      setBusy(false);
+    }
+  };
+
+  const payAndVerify = async () => {
+    if (!file) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await idbStore.setFile(file);
+      const res = await api.initiatePurchase(1);
+      pendingPurchaseStore.set({
+        purchaseId: res.purchaseId,
+        credits: 1,
+        initiatedAt: new Date().toISOString(),
+      });
+      sessionStorage.setItem("veradoc.isPayAndVerify", "true");
+      window.location.href = res.checkoutUrl;
+    } catch (err) {
+      setError("Could not initiate payment. Please try again.");
       setBusy(false);
     }
   };
@@ -428,7 +466,7 @@ export default function VerifyPage() {
                   type="button"
                   className="vd-btn-pay"
                   disabled={!file || busy}
-                  onClick={start}
+                  onClick={payAndVerify}
                 >
                   {busy ? (
                     <>
@@ -446,7 +484,7 @@ export default function VerifyPage() {
                   type="button"
                   className="vd-btn-credit-alt"
                   disabled={!file || busy}
-                  onClick={start}
+                  onClick={() => start()}
                 >
                   Use 1 credit instead
                 </button>

@@ -99,6 +99,13 @@ function CallbackContent() {
         if (res.status === "completed") {
           stopPolling();
           pendingPurchaseStore.clear();
+
+          if (sessionStorage.getItem("veradoc.isPayAndVerify") === "true") {
+            sessionStorage.removeItem("veradoc.isPayAndVerify");
+            window.location.href = "/verify?payment=success";
+            return;
+          }
+
           setStatus("success");
         } else if (res.status === "failed") {
           stopPolling();
