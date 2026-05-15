@@ -70,9 +70,9 @@ Note that this frontend connects to the VeraDoc FastAPI backend at:
 All API calls go through `src/lib/api.ts`.
 
 ## Team
-- Samuel Ezekiel — Frontend Engineer
-- Oluwatobi Lupo — Frontend Engineer
-- Temiloluwa Gboyega — Backend Engineer
+- Samuel Ezekiel(https://github.com/samkiell) — Frontend Engineer
+- Oluwatobi Lupo(https://github.com/luponetn) — Frontend Engineer
+- Temiloluwa Gboyega(https://github.com/temiloluwagboyega) — Backend Engineer
 
 Obafemi Awolowo University, Ile-Ife · Squad Hackathon 3.0
 
