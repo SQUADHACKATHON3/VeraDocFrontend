@@ -22,6 +22,7 @@ export default function SettingsPage() {
   const [deleteText, setDeleteText] = useState("");
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -122,12 +123,20 @@ export default function SettingsPage() {
           <h2>Change password</h2>
           {(["currentPassword", "newPassword", "confirmNewPassword"] as const).map((field, i) => {
             const labels = ["Current password", "New password", "Confirm new"];
-            const show = i === 0 ? showCurrent : i === 1 ? showNew : false;
-            const setShow = i === 0 ? setShowCurrent : i === 1 ? setShowNew : () => {};
+            const show =
+              i === 0 ? showCurrent : i === 1 ? showNew : i === 2 ? showConfirm : false;
+            const setShow =
+              i === 0
+                ? setShowCurrent
+                : i === 1
+                  ? setShowNew
+                  : i === 2
+                    ? setShowConfirm
+                    : () => {};
             return (
               <div key={field} className="vd-settings-field">
                 <label>{labels[i]}</label>
-                <div style={{ position: "relative" }}>
+                <div className="vd-input-wrap">
                   <input
                     {...register(field, {
                       required: "Required",
@@ -142,27 +151,16 @@ export default function SettingsPage() {
                     })}
                     type={show ? "text" : "password"}
                     className="vd-input"
-                    style={{ paddingRight: i < 2 ? 44 : undefined }}
                   />
-                  {i < 2 && (
-                    <button
-                      type="button"
-                      onClick={() => setShow(!show)}
-                      style={{
-                        position: "absolute",
-                        right: 12,
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        border: "none",
-                        background: "transparent",
-                        color: "var(--ink-3)",
-                        cursor: "pointer",
-                        padding: 4,
-                      }}
-                    >
-                      {show ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    className="vd-input-toggle"
+                    onClick={() => setShow(!show)}
+                    aria-label={show ? "Hide password" : "Show password"}
+                    disabled={loading}
+                  >
+                    {show ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
                 {errors[field] && (
                   <p style={{ margin: "6px 0 0", fontSize: 12, color: "var(--fake)" }}>

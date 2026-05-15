@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { api, tokenStore } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 
@@ -11,56 +12,64 @@ function CallbackContent() {
   const { refreshUser } = useAuth();
 
   useEffect(() => {
+    const oauthError = searchParams.get("error");
+    if (oauthError) {
+      router.replace(`/auth/login?error=${encodeURIComponent(oauthError)}`);
+      return;
+    }
+
     const token = searchParams.get("token");
     const refreshToken = searchParams.get("refresh_token");
 
     if (!token || !refreshToken) {
-      router.push("/auth/login");
+      router.replace("/auth/login?error=Sign-in%20failed.%20Please%20try%20again.");
       return;
     }
 
     (async () => {
       try {
-        // Store tokens
         tokenStore.set({
           access_token: token,
           refresh_token: refreshToken,
           token_type: "bearer",
         });
 
-        // Hydrate user
         await refreshUser();
-        
-        // Re-fetch user to check verification status
         const user = await api.me();
-        
-        if (!user.emailVerified) {
-          router.push("/auth/verify-email");
-        } else {
-          router.push("/dashboard");
-        }
+
+        router.replace(user.emailVerified ? "/dashboard" : "/auth/verify-email");
       } catch (err) {
         console.error("Auth callback error:", err);
-        router.push("/auth/login?error=callback_failed");
+        tokenStore.clear();
+        router.replace("/auth/login?error=Sign-in%20failed.%20Please%20try%20again.");
       }
     })();
   }, [router, searchParams, refreshUser]);
 
   return (
-    <div className="min-h-screen bg-canvas flex flex-col items-center justify-center">
-      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
-      <p className="text-ink/50 font-medium animate-pulse">Authenticating...</p>
+    <div className="vd vd-auth" style={{ minHeight: "100vh", placeItems: "center" }}>
+      <main className="vd-auth-main" style={{ width: "100%", maxWidth: 400 }}>
+        <div className="vd-auth-form" style={{ textAlign: "center" }}>
+          <Loader2 className="animate-spin" size={32} style={{ color: "var(--forest)", margin: "0 auto 16px" }} />
+          <p className="vd-auth-kicker">One moment</p>
+          <h1 className="vd-auth-title" style={{ fontSize: 28 }}>
+            Signing you in…
+          </h1>
+        </div>
+      </main>
     </div>
   );
 }
 
 export default function AuthCallbackPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-canvas flex flex-col items-center justify-center">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="vd" style={{ minHeight: "100vh", display: "grid", placeItems: "center" }}>
+          <Loader2 className="animate-spin" size={32} style={{ color: "var(--forest)" }} />
+        </div>
+      }
+    >
       <CallbackContent />
     </Suspense>
   );
