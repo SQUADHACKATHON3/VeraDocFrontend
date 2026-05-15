@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { api } from "@/lib/api";
 import { Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
+import Logo from "@/components/brand/Logo";
 
 type ForgotPasswordForm = {
   email: string;
@@ -42,22 +42,22 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-dark-bg text-foreground font-poppins selection:bg-primary/30">
-      <Navbar />
+    <div className="min-h-screen bg-canvas text-foreground font-sans selection:bg-primary/30">
+      <div className="p-6"><Logo /></div>
 
       <main className="flex flex-col items-center justify-center p-6 pt-32 lg:pt-40">
-        <div className="w-full max-w-md glass p-8 md:p-10 rounded-[2.5rem] border border-card-border bg-card/50 backdrop-blur-xl reveal active">
+        <div className="w-full max-w-md rounded-xl border border-border bg-surface-raised p-8 md:p-10 rounded-[2.5rem] border border-border  reveal active">
           <Link 
             href="/auth/login" 
-            className="inline-flex items-center gap-2 text-foreground/40 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors mb-8"
+            className="inline-flex items-center gap-2 text-foreground/40 hover:text-ink text-xs font-bold uppercase tracking-widest transition-colors mb-8"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to login
           </Link>
 
           <div className="mb-10">
-            <h1 className="text-3xl font-bold text-white mb-3 tracking-tight">Reset your password.</h1>
-            <p className="text-foreground/50 font-medium leading-relaxed">
+            <h1 className="text-3xl font-bold text-ink mb-3 tracking-tight">Reset your password.</h1>
+            <p className="text-ink-secondary font-medium leading-relaxed">
               Enter your email and we'll send you a reset code.
             </p>
           </div>
@@ -74,7 +74,7 @@ export default function ForgotPasswordPage() {
                   }
                 })}
                 disabled={isLoading}
-                className={`w-full bg-card border ${errors.email ? 'border-red-500' : 'border-card-border'} focus:border-primary rounded-2xl px-5 py-4 outline-none transition-all font-medium text-white placeholder:text-white/10`}
+                className={`w-full bg-card border ${errors.email ? 'border-red-500' : 'border-border'} focus:border-primary rounded-2xl px-5 py-4 outline-none transition-all font-medium text-ink placeholder:text-ink/10`}
                 placeholder="name@institution.edu.ng"
               />
               {errors.email && <p className="text-red-500 text-xs mt-1 ml-1 font-medium">{errors.email.message}</p>}
@@ -89,7 +89,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-white font-bold py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+              className="w-full bg-forest hover:bg-forest-mid disabled:bg-primary/50 text-ink font-bold py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
             >
               {isLoading ? (
                 <>

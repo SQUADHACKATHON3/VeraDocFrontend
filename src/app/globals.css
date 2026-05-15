@@ -1,103 +1,59 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-poppins);
-  --font-heading: var(--font-poppins);
+  --color-canvas: #faf8f2;
+  --color-surface: #f4f1ea;
+  --color-surface-raised: #fffdf7;
+  --color-ink: #0e0f0d;
+  --color-ink-secondary: #57544d;
+  --color-ink-muted: #908c82;
+  --color-ink-faint: #b7b3a6;
+  --color-border: #ece7db;
+  --color-border-strong: #e3ded1;
+  --color-forest: #14322b;
+  --color-forest-mid: #1f4e40;
+  --color-forest-light: #dde5de;
+  --color-accent: #b0392a;
+  --color-accent-soft: #f0dbd7;
+  --color-warn: #8a5a14;
+  --color-warn-soft: #f0e5d1;
+  --color-success: #14322b;
+  --color-success-soft: #dde5de;
 
-  --color-primary: #2563EB;
-  --color-primary-light: #3B82F6;
-  --color-primary-hover: #1D4ED8;
-  --color-dark-bg: #080B14;
-
-  /* Flat dark surfaces */
-  --color-card: #0F1623;
-  --color-card-border: #1E2A3A;
-  --color-sidebar: #0A0F1A;
+  --font-sans: var(--font-geist);
 }
 
 :root {
-  --background: #080B14;
-  --foreground: #F8FAFC;
-
-  --font-poppins: "Poppins", sans-serif;
+  --background: #faf8f2;
+  --foreground: #0e0f0d;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-poppins), sans-serif;
-  overflow-x: hidden;
+  font-family: var(--font-geist), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-poppins), sans-serif;
-  font-weight: 700;
+::selection {
+  background: #dde5de;
+  color: #14322b;
 }
 
-
-/* Flat card surface (formerly glassmorphism) */
-.glass {
-  background: #0F1623;
-  border: 1px solid #1E2A3A;
-}
-
-.glass-hover:hover {
-  border-color: #2563EB;
-}
-
-/* Single sharp shadow — used only where elevation is needed */
-.shadow-sharp {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-}
-
-/* Custom Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideDown {
-  from { transform: translateY(-10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out forwards;
-}
-
-.animate-slide-down {
-  animation: slideDown 0.3s ease-out forwards;
-}
-
-/* Scroll Animations */
-.reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.reveal.active {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-
-/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #080B14;
+  background: #f4f1ea;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1E2A3A;
+  background: #c9c2b0;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2563EB;
+  background: #908c82;
 }

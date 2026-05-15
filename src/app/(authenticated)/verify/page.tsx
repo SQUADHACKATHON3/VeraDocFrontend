@@ -1,526 +1,472 @@
-/**
- * Verify Page — /verify
- * The core verification interface where users upload documents for AI analysis.
- * Auth required: Yes
- */
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Upload,
   FileText,
-  Image as ImageIcon,
-  ShieldCheck,
-  ShieldAlert,
-  ShieldX,
   Loader2,
-  X,
-  ArrowRight,
-  Shield,
   CheckCircle2,
   AlertTriangle,
-  Coins,
+  X,
+  ArrowRight,
+  Check,
 } from "lucide-react";
-import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import {
-  api,
-  ApiError,
-  type Verdict,
-  type VerificationStatusOut,
-} from "@/lib/api";
+import { api, ApiError, formatNaira, type VerificationStatusOut } from "@/lib/api";
 import BuyCreditsModal from "@/components/BuyCreditsModal";
+import { formatVerdict, verdictPillClass } from "@/lib/verdict";
 
-type VerificationStep = 1 | 2 | 3 | 4;
+const ALLOWED = ["application/pdf", "image/jpeg", "image/png"];
+const MAX = 5 * 1024 * 1024;
 
-const ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/png"];
-const MAX_SIZE = 5 * 1024 * 1024;
-const POLL_MS = 3000;
-const TIMEOUT_MS = 60000;
+const CHECKS = [
+  "Font consistency across all pages",
+  "Seal & watermark integrity",
+  "Layout, alignment and spacing anomalies",
+  "Text-layer tampering signals",
+  "Date format & logical consistency",
+  "Institution name & official formatting",
+  "Signature presence and placement",
+];
+
+const FORENSIC_CHECKS = [
+  "Font consistency",
+  "Seal & watermark integrity",
+  "Layout & spacing analysis",
+  "Text-layer tamper signals",
+  "Date format validation",
+  "Institution name matching",
+  "Signature placement",
+];
+
+type Step = 1 | 2 | 3 | 4;
+
+const STEPS = [
+  { id: 1, label: "01 · Upload" },
+  { id: 2, label: "02 · Pay" },
+  { id: 3, label: "03 · Verify" },
+] as const;
+
+function stepIndicatorState(phase: 1 | 2 | 3, n: number): string {
+  if (phase >= 3) {
+    if (n < 3) return "done";
+    if (n === 3) return "active";
+    return "";
+  }
+  if (phase === 2) {
+    if (n === 1) return "done";
+    if (n === 2) return "active";
+    return "";
+  }
+  if (phase === 1 && n === 1) return "active";
+  return "";
+}
 
 export default function VerifyPage() {
-  const router = useRouter();
   const { user, refreshUser } = useAuth();
-
-  const [step, setStep] = useState<VerificationStep>(1);
+  const [step, setStep] = useState<Step>(1);
   const [file, setFile] = useState<File | null>(null);
-  const [isDragActive, setIsDragActive] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [verificationId, setVerificationId] = useState<string | null>(null);
+  const [drag, setDrag] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [vid, setVid] = useState<string | null>(null);
   const [result, setResult] = useState<VerificationStatusOut | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [statusLines, setStatusLines] = useState(0);
-  const [showBuyCredits, setShowBuyCredits] = useState(false);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [checkIdx, setCheckIdx] = useState(0);
+  const [showBuy, setShowBuy] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const credits = user?.credits ?? 0;
 
-  // Poll verification status during step 3.
   useEffect(() => {
-    if (step !== 3 || !verificationId) return;
+    if (file && step === 1) setStep(2);
+    if (!file && step === 2) setStep(1);
+  }, [file, step]);
 
-    const lineInterval = setInterval(() => {
-      setStatusLines((prev) => (prev < 3 ? prev + 1 : prev));
-    }, 2000);
-
+  useEffect(() => {
+    if (step !== 3 || !vid) return;
+    const tick = setInterval(
+      () => setCheckIdx((i) => Math.min(i + 1, FORENSIC_CHECKS.length)),
+      1200
+    );
     const poll = setInterval(async () => {
       try {
-        const data = await api.getVerificationStatus(verificationId);
-        if (data.status === "complete") {
-          setResult(data);
+        const d = await api.getVerificationStatus(vid);
+        if (d.status === "complete") {
+          setResult(d);
           setStep(4);
-        } else if (data.status === "error") {
-          setError("Analysis failed. Please contact support.");
+        } else if (d.status === "error") {
+          setError("Analysis failed. Your credit has been refunded.");
         }
-      } catch (err) {
-        console.error("Polling error:", err);
+      } catch {
+        /* retry */
       }
-    }, POLL_MS);
-
-    const timeout = setTimeout(() => {
-      setError("Analysis timed out. Check your history shortly for the result.");
-    }, TIMEOUT_MS);
-
+    }, 3000);
+    const timeout = setTimeout(
+      () => setError("Analysis timed out. Check history shortly."),
+      60000
+    );
     return () => {
-      clearInterval(lineInterval);
+      clearInterval(tick);
       clearInterval(poll);
       clearTimeout(timeout);
     };
-  }, [step, verificationId]);
+  }, [step, vid]);
 
-  const validateAndSetFile = (selectedFile: File) => {
-    if (selectedFile.size > MAX_SIZE) {
-      setError("File size exceeds 5MB limit.");
-      return;
-    }
-    if (!ALLOWED_TYPES.includes(selectedFile.type)) {
-      setError("Only PDF, JPG, and PNG files are allowed.");
-      return;
-    }
+  const pick = (f: File) => {
+    if (f.size > MAX) return setError("File exceeds 5 MB.");
+    if (!ALLOWED.includes(f.type)) return setError("PDF, JPG, or PNG only.");
     setError(null);
-    setFile(selectedFile);
+    setFile(f);
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) validateAndSetFile(selectedFile);
-  };
-
-  const startVerification = async () => {
+  const start = async () => {
     if (!file) return;
-    setIsProcessing(true);
+    setBusy(true);
     setError(null);
-
     try {
       const res = await api.initiateVerification(file);
-      setVerificationId(res.verificationId);
-      await refreshUser(); // a credit was just consumed
-      setStatusLines(0);
+      setVid(res.verificationId);
+      await refreshUser();
+      setCheckIdx(0);
       setStep(3);
     } catch (err) {
-      if (err instanceof ApiError && err.status === 402) {
-        // Out of credits — prompt a top-up.
-        setShowBuyCredits(true);
-      } else if (err instanceof ApiError) {
-        setError(err.message);
-      } else {
-        setError("Failed to start verification. Please try again.");
-      }
+      if (err instanceof ApiError && err.status === 402) setShowBuy(true);
+      else
+        setError(
+          err instanceof ApiError ? err.message : "Could not start verification."
+        );
     } finally {
-      setIsProcessing(false);
+      setBusy(false);
     }
   };
 
   const reset = () => {
     setStep(1);
     setFile(null);
-    setVerificationId(null);
+    setVid(null);
     setResult(null);
     setError(null);
-    setStatusLines(0);
+    setCheckIdx(0);
+  };
+
+  const getStepState = (n: number) => {
+    if (step >= 3) return stepIndicatorState(3, n);
+    return stepIndicatorState(file ? 2 : 1, n);
   };
 
   return (
-    <div className="max-w-[680px] mx-auto p-6 md:p-10 lg:pt-20">
-      {/* Step 1: Upload */}
-      {step === 1 && (
-        <div className="space-y-8 reveal active">
-          <div>
-            <h1 className="text-4xl font-heading font-black mb-3">
-              Upload your document.
-            </h1>
-            <p className="text-foreground/50 font-medium text-lg">
-              PDF, JPG, PNG or JPEG. Maximum 5MB.
-            </p>
-          </div>
+    <div className="vd-verify-page">
+      {step < 3 && (
+        <div className="vd-verify-steps">
+          {STEPS.map((s) => (
+            <span key={s.id} className={getStepState(s.id)}>
+              {s.label}
+            </span>
+          ))}
+        </div>
+      )}
 
-          {!file ? (
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragActive(true);
-              }}
-              onDragLeave={() => setIsDragActive(false)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setIsDragActive(false);
-                const droppedFile = e.dataTransfer.files[0];
-                if (droppedFile) validateAndSetFile(droppedFile);
-              }}
-              onClick={() => fileInputRef.current?.click()}
-              className={`relative border-2 border-dashed rounded-[2.5rem] p-10 sm:p-16 md:p-20 flex flex-col items-center justify-center gap-4 transition-all cursor-pointer group ${
-                isDragActive
-                  ? "border-primary bg-primary/5 scale-[1.02]"
-                  : "border-card-border hover:border-primary hover:bg-white/[0.02]"
-              }`}
-            >
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                className="hidden"
-                accept=".pdf,.jpg,.jpeg,.png"
-                aria-label="Upload document"
-              />
-              <div className="w-16 h-16 rounded-3xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Upload className="w-8 h-8 text-primary" />
+      {step === 3 && (
+        <div className="vd-analyse">
+          <div className="vd-scan-stage" aria-hidden>
+            <div className="vd-scan-frame">
+              <div className="vd-scan-corners">
+                <span className="tl" />
+                <span className="tr" />
+                <span className="bl" />
+                <span className="br" />
               </div>
-              <div className="text-center">
-                <p className="text-xl font-heading font-bold text-white mb-1">
-                  Drag and drop your file here
-                </p>
-                <p className="text-foreground/40 font-medium">
-                  or <span className="text-primary font-bold">click to browse</span>
-                </p>
+              <div className="vd-scan-doc">
+                <div className="vd-scan-lines">
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                </div>
+                <div className="vd-scan-beam" />
               </div>
             </div>
-          ) : (
-            <div className="glass p-6 rounded-3xl flex items-center justify-between group">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center">
-                  {file.type === "application/pdf" ? (
-                    <FileText className="w-6 h-6 text-foreground/40" />
-                  ) : (
-                    <ImageIcon className="w-6 h-6 text-foreground/40" />
-                  )}
-                </div>
-                <div>
-                  <p className="font-bold text-white truncate max-w-[200px] md:max-w-[300px]">
-                    {file.name}
-                  </p>
-                  <p className="text-xs font-bold text-foreground/40 uppercase tracking-widest">
-                    {(file.size / 1024 / 1024).toFixed(2)} MB
-                  </p>
-                </div>
-              </div>
+          </div>
+
+          <p className="vd-analyse-kicker">STEP 03 OF 03</p>
+          <h1 className="vd-verify-title">
+            Analysing the <em>document.</em>
+          </h1>
+          <p className="vd-verify-lead">
+            We&apos;re running seven forensic checks via the vision model. This usually
+            takes under ten seconds.
+          </p>
+
+          <ul className="vd-check-rows">
+            {FORENSIC_CHECKS.map((label, i) => {
+              const done = checkIdx > i;
+              const active = checkIdx === i;
+              const state = done ? "done" : active ? "active" : "queued";
+              return (
+                <li key={label} className={`vd-check-row vd-check-row--${state}`}>
+                  <span className={`vd-check-icon vd-check-icon--${state}`}>
+                    {done && <Check size={12} strokeWidth={2.5} />}
+                  </span>
+                  <span className="vd-check-label">{label}</span>
+                  <span className="vd-check-status">
+                    {done ? "OK" : active ? "analysing…" : "queued"}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+          {error && (
+            <div className="vd-verify-error" style={{ marginTop: 20, textAlign: "left" }}>
+              {error}
               <button
                 type="button"
-                onClick={() => setFile(null)}
-                aria-label="Remove file"
-                className="p-2 rounded-lg hover:bg-red-500/10 text-foreground/20 hover:text-red-500 transition-all"
+                onClick={reset}
+                style={{
+                  display: "block",
+                  marginTop: 8,
+                  background: "none",
+                  border: "none",
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                }}
               >
-                <X className="w-5 h-5" />
+                Try again
               </button>
             </div>
           )}
+        </div>
+      )}
 
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-2xl text-sm font-medium flex items-center gap-3">
-              <AlertTriangle className="w-5 h-5 flex-shrink-0" />
-              {error}
-            </div>
+      {step === 4 && result && vid && (
+        <div style={{ maxWidth: 480, margin: "0 auto", textAlign: "center" }}>
+          <span className={verdictPillClass(result.verdict)} style={{ marginBottom: 16 }}>
+            {formatVerdict(result.verdict)}
+          </span>
+          <p className="vd-verify-title" style={{ fontSize: 56, marginBottom: 8 }}>
+            {result.trustScore ?? "—"}
+          </p>
+          <p className="vd-eyebrow">Trust score</p>
+          {result.summary && (
+            <p className="vd-verify-lead" style={{ margin: "16px 0" }}>
+              {result.summary}
+            </p>
           )}
-
+          <Link
+            href={`/verify/${vid}`}
+            className="vd-btn-pill vd-btn-pill-dark vd-btn-pill--full"
+            style={{ marginBottom: 12 }}
+          >
+            View full report
+            <ArrowRight size={16} />
+          </Link>
           <button
             type="button"
-            onClick={() => setStep(2)}
-            disabled={!file}
-            className="w-full bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-white font-bold py-5 rounded-[2rem] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+            onClick={reset}
+            className="vd-btn-ghost"
+            style={{ width: "100%" }}
           >
-            Continue <ArrowRight className="w-5 h-5" />
+            Run another
           </button>
         </div>
       )}
 
-      {/* Step 2: Confirm & spend a credit */}
-      {step === 2 && (
-        <div className="space-y-8 reveal active">
-          <div>
-            <h1 className="text-4xl font-heading font-black mb-3">
-              Confirm verification.
+      {(step === 1 || step === 2) && (
+        <>
+          <header className="vd-upload-header">
+            <h1 className="vd-verify-title">
+              Upload your <em>document.</em>
             </h1>
-            <p className="text-foreground/50 font-medium text-lg">
-              Each verification uses one credit. Analysis starts immediately.
+            <p className="vd-verify-lead">
+              We&apos;ll analyse it for tampering, forgery and authenticity signals. One
+              credit per document. PDF, JPG, PNG · up to 5 MB
             </p>
-          </div>
+          </header>
 
-          <div className="glass p-8 rounded-[2.5rem] space-y-6">
-            <div className="flex items-center justify-between pb-6 border-b border-card-border">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-foreground/40" />
+          <div className="vd-upload-grid">
+            <div className="vd-upload-main">
+            {!file ? (
+              <div
+                className={`vd-dropzone${drag ? " drag" : ""}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDrag(true);
+                }}
+                onDragLeave={() => setDrag(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDrag(false);
+                  const f = e.dataTransfer.files[0];
+                  if (f) pick(f);
+                }}
+                onClick={() => inputRef.current?.click()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") inputRef.current?.click();
+                }}
+                role="button"
+                tabIndex={0}
+              >
+                <input
+                  ref={inputRef}
+                  type="file"
+                  className="hidden"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) pick(f);
+                  }}
+                />
+                <div className="vd-dropzone-corners" aria-hidden>
+                  <span className="tl" />
+                  <span className="tr" />
+                  <span className="bl" />
+                  <span className="br" />
                 </div>
-                <p className="font-bold text-white truncate max-w-[150px] md:max-w-[250px]">
-                  {file?.name}
+                <div className="vd-dropzone-icon">
+                  <Upload size={22} strokeWidth={1.5} />
+                </div>
+                <p className="vd-dropzone-title">Drag and drop your file</p>
+                <p className="vd-dropzone-browse">
+                  or <span>click to browse</span>
                 </p>
+                <p className="vd-dropzone-foot">PDF · JPG · PNG · 5 MB MAX</p>
               </div>
-              <p className="text-sm font-bold text-foreground/40">1 credit</p>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-foreground/40 font-medium text-sm">
-                Your balance
-              </span>
-              <span className="flex items-center gap-2 text-white font-bold">
-                <Coins className="w-4 h-4 text-primary-light" />
-                {credits} {credits === 1 ? "credit" : "credits"}
-              </span>
-            </div>
-
-            {credits < 1 && (
-              <div className="bg-amber-500/10 border border-amber-500/20 text-amber-500 p-4 rounded-2xl text-sm font-medium flex items-center gap-3">
-                <AlertTriangle className="w-5 h-5 flex-shrink-0" />
-                You're out of credits. Buy a pack to run this verification.
+            ) : (
+              <div className="vd-file-ready">
+                <div className="vd-file-ready-header">
+                  <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                    <FileText size={24} style={{ color: "var(--forest)", flexShrink: 0 }} />
+                    <div>
+                      <p
+                        className="vd-eyebrow"
+                        style={{ color: "var(--forest)", marginBottom: 4 }}
+                      >
+                        File ready
+                      </p>
+                      <p style={{ fontWeight: 500, margin: 0 }}>{file.name}</p>
+                      <p
+                        className="vd-mono"
+                        style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 4 }}
+                      >
+                        {(file.size / 1024 / 1024).toFixed(1)} MB · uploaded now
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFile(null)}
+                    aria-label="Remove file"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+                <p className="vd-eyebrow" style={{ marginBottom: 8 }}>
+                  What we&apos;ll check
+                </p>
+                <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                  {CHECKS.map((c) => (
+                    <li
+                      key={c}
+                      style={{
+                        display: "flex",
+                        gap: 8,
+                        fontSize: 13,
+                        color: "var(--ink-2)",
+                        marginBottom: 6,
+                      }}
+                    >
+                      <CheckCircle2
+                        size={14}
+                        style={{ color: "var(--forest)", marginTop: 2, flexShrink: 0 }}
+                      />
+                      {c}
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
-          </div>
 
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-2xl text-sm font-medium flex items-center gap-3">
-              <AlertTriangle className="w-5 h-5 flex-shrink-0" />
-              {error}
+            {error && (
+              <div className="vd-verify-error">
+                <AlertTriangle size={18} style={{ flexShrink: 0 }} />
+                <span>{error}</span>
+              </div>
+            )}
             </div>
-          )}
 
-          <div className="space-y-4">
+          <aside className="vd-order-panel">
+            <p className="vd-eyebrow">Order</p>
+            <div className="vd-order-line">
+              <div>
+                <h3>1 verification</h3>
+                <p>~8 seconds · 1 credit</p>
+              </div>
+              <span className="vd-order-price">{formatNaira(70000)}</span>
+            </div>
+            <div className="vd-order-credits">
+              <div className="vd-order-credits-row">
+                <span>Credit balance</span>
+                <span>{credits} credits</span>
+              </div>
+              <div className="vd-order-credits-row">
+                <span>After verification</span>
+                <span>{Math.max(0, credits - 1)} credits</span>
+              </div>
+            </div>
+
             {credits < 1 ? (
               <button
                 type="button"
-                onClick={() => setShowBuyCredits(true)}
-                className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-5 rounded-[2rem] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+                className="vd-btn-pay"
+                onClick={() => setShowBuy(true)}
               >
-                <Coins className="w-5 h-5" /> Buy Credits
+                Top up to verify
               </button>
             ) : (
-              <button
-                type="button"
-                onClick={startVerification}
-                disabled={isProcessing}
-                className="w-full bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-white font-bold py-5 rounded-[2rem] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
-              >
-                {isProcessing ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Starting analysis...</span>
-                  </>
-                ) : (
-                  <>
-                    Verify Document (1 credit) <ArrowRight className="w-5 h-5" />
-                  </>
-                )}
-              </button>
+              <>
+                <button
+                  type="button"
+                  className="vd-btn-pay"
+                  disabled={!file || busy}
+                  onClick={start}
+                >
+                  {busy ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Starting…
+                    </>
+                  ) : (
+                    <>
+                      Pay &amp; verify
+                      <ArrowRight size={16} />
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="vd-btn-credit-alt"
+                  disabled={!file || busy}
+                  onClick={start}
+                >
+                  Use 1 credit instead
+                </button>
+              </>
             )}
-            <button
-              type="button"
-              onClick={() => {
-                setStep(1);
-                setError(null);
-              }}
-              disabled={isProcessing}
-              className="w-full text-foreground/40 hover:text-white font-bold py-2 transition-colors text-sm"
-            >
-              ← Back
-            </button>
-          </div>
-        </div>
-      )}
 
-      {/* Step 3: Processing */}
-      {step === 3 && (
-        <div className="text-center space-y-12 py-10 reveal active">
-          <div className="relative inline-block">
-            <div className="rounded-full border-4 border-primary/20 border-t-primary animate-spin absolute -inset-2" />
-            <div className="w-32 h-32 rounded-full bg-primary/10 flex items-center justify-center animate-pulse border-2 border-primary/30">
-              <Shield className="w-12 h-12 text-primary" />
-            </div>
-          </div>
-
-          <div>
-            <h1 className="text-4xl font-heading font-black mb-3">
-              Analyzing your document.
-            </h1>
-            <p className="text-foreground/50 font-medium text-lg">
-              This usually takes under 10 seconds.
+            <p className="vd-order-note">
+              Documents are encrypted in transit and at rest. Files are not used for AI
+              training.
             </p>
+          </aside>
           </div>
-
-          <div className="max-w-xs mx-auto space-y-4">
-            {[
-              { id: 1, label: "Document received", success: true },
-              { id: 2, label: "Running forensic analysis...", success: false },
-              { id: 3, label: "Generating trust report...", success: false },
-            ].map((line, i) => (
-              <div
-                key={line.id}
-                className={`flex items-center gap-3 transition-all duration-500 ${
-                  statusLines >= i
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-4"
-                }`}
-              >
-                {statusLines > i || (statusLines === i && line.success) ? (
-                  <CheckCircle2 className="w-5 h-5 text-green-500" />
-                ) : statusLines === i ? (
-                  <Loader2 className="w-5 h-5 text-primary animate-spin" />
-                ) : (
-                  <div className="w-5 h-5 rounded-full border-2 border-white/10" />
-                )}
-                <span
-                  className={`text-sm font-bold ${
-                    statusLines >= i ? "text-foreground" : "text-foreground/20"
-                  }`}
-                >
-                  {line.label}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {error && (
-            <div className="space-y-6 pt-4">
-              <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-6 rounded-[2.5rem] text-sm font-medium">
-                {error}
-              </div>
-              <div className="flex items-center justify-center gap-4">
-                <button
-                  type="button"
-                  onClick={reset}
-                  className="bg-white text-dark-bg px-8 py-3 rounded-full font-bold hover:scale-105 transition-all"
-                >
-                  Start Over
-                </button>
-                <Link
-                  href="/history"
-                  className="text-foreground/40 hover:text-white font-bold text-sm transition-colors"
-                >
-                  View History
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Step 4: Result Preview */}
-      {step === 4 && result && verificationId && (
-        <div className="space-y-10 reveal active">
-          <div
-            className={`p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border transition-all duration-700 ${
-              result.verdict === "AUTHENTIC"
-                ? "bg-[#052e16] border-[#16A34A]"
-                : result.verdict === "SUSPICIOUS"
-                ? "bg-[#431407] border-[#D97706]"
-                : "bg-[#450a0a] border-[#DC2626]"
-            }`}
-          >
-            <div className="flex flex-col items-center text-center space-y-6">
-              <div
-                className={`w-20 h-20 rounded-3xl flex items-center justify-center ${
-                  result.verdict === "AUTHENTIC"
-                    ? "bg-green-500/20"
-                    : result.verdict === "SUSPICIOUS"
-                    ? "bg-amber-500/20"
-                    : "bg-red-500/20"
-                }`}
-              >
-                {result.verdict === "AUTHENTIC" && (
-                  <ShieldCheck className="w-10 h-10 text-green-500" />
-                )}
-                {result.verdict === "SUSPICIOUS" && (
-                  <ShieldAlert className="w-10 h-10 text-amber-500" />
-                )}
-                {result.verdict === "FAKE" && (
-                  <ShieldX className="w-10 h-10 text-red-500" />
-                )}
-              </div>
-
-              <div>
-                <h2
-                  className={`text-4xl sm:text-5xl font-heading font-black mb-2 ${
-                    result.verdict === "AUTHENTIC"
-                      ? "text-[#16A34A]"
-                      : result.verdict === "SUSPICIOUS"
-                      ? "text-[#D97706]"
-                      : "text-[#DC2626]"
-                  }`}
-                >
-                  {result.verdict}
-                </h2>
-                <div className="flex items-baseline justify-center gap-2">
-                  <span className="text-4xl font-heading font-black text-white">
-                    {result.trustScore ?? "—"}%
-                  </span>
-                  <span className="text-foreground/40 font-bold uppercase tracking-widest text-sm">
-                    Trust Score
-                  </span>
-                </div>
-              </div>
-
-              {result.summary && (
-                <p className="text-lg text-foreground/60 font-medium leading-relaxed max-w-sm">
-                  {result.summary}
-                </p>
-              )}
-
-              <div className="w-full h-px bg-card-border my-4" />
-
-              <div className="w-full space-y-4">
-                <Link
-                  href={`/verify/${verificationId}`}
-                  className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-5 rounded-[2rem] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
-                >
-                  View Full Report <ArrowRight className="w-5 h-5" />
-                </Link>
-                <button
-                  type="button"
-                  onClick={reset}
-                  className="w-full text-foreground/40 hover:text-white font-bold py-3 transition-colors text-sm"
-                >
-                  Run Another Verification
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center">
-            <Link
-              href="/dashboard"
-              className="text-sm font-bold text-foreground/20 hover:text-primary transition-all underline underline-offset-8 decoration-white/5 hover:decoration-primary/30"
-            >
-              ← Back to Dashboard
-            </Link>
-          </div>
-        </div>
+        </>
       )}
 
       <BuyCreditsModal
-        open={showBuyCredits}
-        onClose={() => setShowBuyCredits(false)}
+        open={showBuy}
+        onClose={() => setShowBuy(false)}
         onPurchased={() => refreshUser()}
       />
-
-      <style jsx>{`
-        .reveal {
-          opacity: 0;
-          transform: translateY(20px);
-          transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
-        }
-        .reveal.active {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      `}</style>
     </div>
   );
 }

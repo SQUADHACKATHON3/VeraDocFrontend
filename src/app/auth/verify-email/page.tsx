@@ -107,12 +107,12 @@ export default function VerifyEmailPage() {
   const isComplete = otp.every(digit => digit !== "");
 
   return (
-    <div className="min-h-screen bg-dark-bg flex items-center justify-center p-6 font-poppins">
-      <div className="w-full max-w-md glass p-8 md:p-10 rounded-[2.5rem] border border-card-border bg-card/50 backdrop-blur-xl">
+    <div className="min-h-screen bg-canvas flex items-center justify-center p-6 font-sans">
+      <div className="w-full max-w-md rounded-xl border border-border bg-surface-raised p-8 md:p-10 rounded-[2.5rem] border border-border ">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-3">Verify your email.</h1>
-          <p className="text-foreground/50 text-sm leading-relaxed">
-            We sent a 6-digit code to <span className="text-white font-semibold">{user?.email || "your email"}</span>. 
+          <h1 className="text-3xl font-bold text-ink mb-3">Verify your email.</h1>
+          <p className="text-ink-secondary text-sm leading-relaxed">
+            We sent a 6-digit code to <span className="text-ink font-semibold">{user?.email || "your email"}</span>. 
             Enter it below to activate your account.
           </p>
         </div>
@@ -130,7 +130,7 @@ export default function VerifyEmailPage() {
                 onChange={e => handleChange(index, e.target.value)}
                 onKeyDown={e => handleKeyDown(index, e)}
                 onPaste={handlePaste}
-                className="w-12 h-14 md:w-14 md:h-16 bg-card border border-card-border focus:border-primary rounded-xl text-center text-2xl font-bold text-white outline-none transition-all"
+                className="w-12 h-14 md:w-14 md:h-16 bg-card border border-border focus:border-primary rounded-xl text-center text-2xl font-bold text-ink outline-none transition-all"
               />
             ))}
           </div>
@@ -139,7 +139,7 @@ export default function VerifyEmailPage() {
             <button
               type="submit"
               disabled={!isComplete || isLoading}
-              className="w-full bg-primary hover:bg-primary-hover disabled:bg-primary/50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+              className="w-full bg-forest hover:bg-forest-mid disabled:bg-primary/50 disabled:cursor-not-allowed text-ink font-bold py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
             >
               {isLoading ? (
                 <>
@@ -164,7 +164,7 @@ export default function VerifyEmailPage() {
                 type="button"
                 onClick={handleResend}
                 disabled={resendTimer > 0 || isResending}
-                className="text-sm font-medium text-foreground/50 hover:text-[#2563EB] transition-colors disabled:text-foreground/30 disabled:cursor-not-allowed"
+                className="text-sm font-medium text-ink-secondary hover:text-[#2563EB] transition-colors disabled:text-foreground/30 disabled:cursor-not-allowed"
               >
                 {resendTimer > 0 ? (
                   `Resend in 0:${resendTimer.toString().padStart(2, "0")}`

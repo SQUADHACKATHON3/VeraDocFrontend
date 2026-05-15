@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { api } from "@/lib/api";
 import { Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import Logo from "@/components/brand/Logo";
 import Link from "next/link";
 
 export default function ResetPasswordPage() {
@@ -127,16 +127,16 @@ export default function ResetPasswordPage() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-dark-bg flex items-center justify-center p-6 font-poppins">
-        <div className="w-full max-w-md glass p-8 md:p-10 rounded-[2.5rem] border border-card-border bg-card/50 backdrop-blur-xl text-center">
+      <div className="min-h-screen bg-canvas flex items-center justify-center p-6 font-sans">
+        <div className="w-full max-w-md rounded-xl border border-border bg-surface-raised p-8 md:p-10 rounded-[2.5rem] border border-border  text-center">
           <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 className="w-8 h-8 text-emerald-500" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Password reset successfully.</h1>
-          <p className="text-foreground/50 mb-8 font-medium">You can now sign in with your new password.</p>
+          <h1 className="text-2xl font-bold text-ink mb-2">Password reset successfully.</h1>
+          <p className="text-ink-secondary mb-8 font-medium">You can now sign in with your new password.</p>
           <Link 
             href="/auth/login"
-            className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 rounded-2xl transition-all block text-center"
+            className="w-full bg-forest hover:bg-forest-mid text-ink font-bold py-4 rounded-2xl transition-all block text-center"
           >
             Sign In →
           </Link>
@@ -146,14 +146,14 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-bg text-foreground font-poppins selection:bg-primary/30">
-      <Navbar />
+    <div className="min-h-screen bg-canvas text-foreground font-sans selection:bg-primary/30">
+      <div className="p-6"><Logo /></div>
 
       <main className="flex flex-col items-center justify-center p-6 pt-32 lg:pt-40">
-        <div className="w-full max-w-md glass p-8 md:p-10 rounded-[2.5rem] border border-card-border bg-card/50 backdrop-blur-xl reveal active">
+        <div className="w-full max-w-md rounded-xl border border-border bg-surface-raised p-8 md:p-10 rounded-[2.5rem] border border-border  reveal active">
           <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-tight">Enter your reset code.</h1>
-            <p className="text-foreground/50 text-sm font-medium leading-relaxed">
+            <h1 className="text-2xl md:text-3xl font-bold text-ink mb-3 tracking-tight">Enter your reset code.</h1>
+            <p className="text-ink-secondary text-sm font-medium leading-relaxed">
               Check your email for the 6-digit reset code.
             </p>
           </div>
@@ -171,7 +171,7 @@ export default function ResetPasswordPage() {
                   onChange={e => handleChange(index, e.target.value)}
                   onKeyDown={e => handleKeyDown(index, e)}
                   onPaste={handlePaste}
-                  className="w-12 h-14 bg-card border border-card-border focus:border-primary rounded-xl text-center text-xl font-bold text-white outline-none transition-all"
+                  className="w-12 h-14 bg-card border border-border focus:border-primary rounded-xl text-center text-xl font-bold text-ink outline-none transition-all"
                 />
               ))}
             </div>
@@ -187,13 +187,13 @@ export default function ResetPasswordPage() {
                     })}
                     type={showPassword ? "text" : "password"}
                     disabled={isLoading}
-                    className={`w-full bg-card border ${errors.newPassword ? 'border-red-500' : 'border-card-border'} focus:border-primary rounded-xl px-5 py-3.5 outline-none transition-all font-medium text-white text-sm`}
+                    className={`w-full bg-card border ${errors.newPassword ? 'border-red-500' : 'border-border'} focus:border-primary rounded-xl px-5 py-3.5 outline-none transition-all font-medium text-ink text-sm`}
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-white/20 hover:text-white/50 transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-ink/20 hover:text-ink/50 transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -210,7 +210,7 @@ export default function ResetPasswordPage() {
                   })}
                   type={showPassword ? "text" : "password"}
                   disabled={isLoading}
-                  className={`w-full bg-card border ${errors.confirmPassword ? 'border-red-500' : 'border-card-border'} focus:border-primary rounded-xl px-5 py-3.5 outline-none transition-all font-medium text-white text-sm`}
+                  className={`w-full bg-card border ${errors.confirmPassword ? 'border-red-500' : 'border-border'} focus:border-primary rounded-xl px-5 py-3.5 outline-none transition-all font-medium text-ink text-sm`}
                   placeholder="••••••••"
                 />
                 {errors.confirmPassword && <p className="text-red-500 text-[10px] mt-1 ml-1 font-medium">{errors.confirmPassword.message as string}</p>}
@@ -221,7 +221,7 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={!isOtpComplete || !!errors.newPassword || !!errors.confirmPassword || !newPassword || isLoading}
-                className="w-full bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-white font-bold py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+                className="w-full bg-forest hover:bg-forest-mid disabled:bg-primary/50 text-ink font-bold py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
               >
                 {isLoading ? (
                   <>
@@ -242,7 +242,7 @@ export default function ResetPasswordPage() {
                   type="button"
                   onClick={handleResend}
                   disabled={resendTimer > 0 || isResending}
-                  className="text-sm font-medium text-foreground/50 hover:text-primary transition-colors disabled:text-foreground/30 disabled:cursor-not-allowed"
+                  className="text-sm font-medium text-ink-secondary hover:text-forest transition-colors disabled:text-foreground/30 disabled:cursor-not-allowed"
                 >
                   {resendTimer > 0 ? (
                     `Resend in 0:${resendTimer.toString().padStart(2, "0")}`

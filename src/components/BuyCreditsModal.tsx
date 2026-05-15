@@ -1,22 +1,20 @@
 "use client";
 
-/**
- * Credits purchase flow (Squad checkout).
- *
- *   pick a pack -> POST /api/credits/purchase/initiate -> open checkoutUrl
- *   -> poll POST /api/credits/purchases/{id}/verify until completed/failed
- *   -> refresh the user's balance.
- */
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import { X, Loader2, CheckCircle2, AlertTriangle, ExternalLink } from "lucide-react";
-import { api, formatNaira, ApiError, pendingPurchaseStore, type CreditPack } from "@/lib/api";
+import {
+  api,
+  formatNaira,
+  ApiError,
+  pendingPurchaseStore,
+  type CreditPack,
+} from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { cn } from "@/lib/cn";
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  /** Called once credits land on the account. */
   onPurchased?: () => void;
 };
 
@@ -31,7 +29,6 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
   const [isInitiating, setIsInitiating] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Resume polling for a pending purchase that survived a page refresh / tab switch.
   const resumePendingPurchase = useCallback(
     (purchaseId: string) => {
       setPhase("awaiting");
@@ -51,20 +48,18 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
             setPhase("error");
           }
         } catch {
-          /* transient — keep polling */
+          /* keep polling */
         }
       }, 3000);
     },
     [refreshUser, onPurchased]
   );
 
-  // Load the pack catalogue when the modal opens, and check for pending purchase.
   useEffect(() => {
     if (!open) return;
     setError(null);
     setSelected(null);
 
-    // If there's a pending purchase less than 30 minutes old, resume polling.
     const pending = pendingPurchaseStore.get();
     if (pending) {
       const age = Date.now() - new Date(pending.initiatedAt).getTime();
@@ -72,7 +67,6 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
         resumePendingPurchase(pending.purchaseId);
         return;
       }
-      // Stale — clear it.
       pendingPurchaseStore.clear();
     }
 
@@ -81,17 +75,13 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
       .getCreditPacks()
       .then((res) => {
         setPacks(res.packs);
-        setSelected(res.packs[0]?.credits ?? null);
+        const best = res.packs.find((p) => p.credits === 20) ?? res.packs[0];
+        setSelected(best?.credits ?? null);
       })
       .catch(() => setError("Couldn't load credit packs. Try again."));
   }, [open, resumePendingPurchase]);
 
-  // Clear any active poll on close/unmount.
-  useEffect(() => {
-    return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
-  }, []);
+  useEffect(() => () => stopPolling(), []);
 
   const stopPolling = () => {
     if (pollRef.current) {
@@ -100,10 +90,10 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
     }
   };
 
-  const handleClose = useCallback(() => {
+  const handleClose = () => {
     stopPolling();
     onClose();
-  }, [onClose]);
+  };
 
   const startPurchase = async () => {
     if (selected == null) return;
@@ -111,98 +101,110 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
     setError(null);
     try {
       const res = await api.initiatePurchase(selected);
-
-      // Persist so the callback page / a refresh can resume polling.
       pendingPurchaseStore.set({
         purchaseId: res.purchaseId,
         credits: res.credits,
         initiatedAt: new Date().toISOString(),
       });
-
       window.open(res.checkoutUrl, "_blank", "noopener,noreferrer");
-
-      // Start polling (reuses the same resilient helper).
       resumePendingPurchase(res.purchaseId);
     } catch (err) {
-      setError(
-        err instanceof ApiError ? err.message : "Couldn't start the purchase."
-      );
+      setError(err instanceof ApiError ? err.message : "Couldn't start the purchase.");
     } finally {
       setIsInitiating(false);
     }
   };
 
+  const selectedPack = packs.find((p) => p.credits === selected);
+
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-      <div
-        className="absolute inset-0 bg-dark-bg/80"
-        onClick={handleClose}
-      />
-      <div className="relative w-full max-w-md glass p-6 sm:p-8 md:p-10 rounded-[2rem] sm:rounded-[3rem] shadow-sharp space-y-6">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-ink/40" onClick={handleClose} aria-hidden />
+      <div className="relative w-full max-w-lg rounded-2xl border border-border bg-surface-raised p-6 md:p-8 shadow-xl max-h-[90vh] overflow-y-auto">
         <button
+          type="button"
           onClick={handleClose}
-          className="absolute right-6 top-6 sm:right-8 sm:top-8 p-2 rounded-lg hover:bg-white/5 text-foreground/20 hover:text-white transition-all"
+          className="absolute right-4 top-4 p-2 text-ink-muted hover:text-ink rounded-lg"
+          aria-label="Close"
         >
           <X className="w-5 h-5" />
         </button>
 
         {phase === "select" && (
           <>
-            <div className="space-y-2">
-              <h2 className="text-3xl font-heading font-black">Buy credits</h2>
-              <p className="text-foreground/50 font-medium text-sm">
-                Each verification uses 1 credit. Pick a pack to top up.
-              </p>
-            </div>
+            <p className="text-[11px] font-medium uppercase tracking-wider text-ink-muted mb-1">
+              Top up · Squad
+            </p>
+            <h2 className="text-2xl font-semibold text-ink mb-2">Buy credits</h2>
+            <p className="text-sm text-ink-secondary mb-6">
+              Each verification uses one credit. Pick a pack to top up.
+            </p>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 mb-6">
               {packs.map((pack) => {
-                const isActive = selected === pack.credits;
+                const active = selected === pack.credits;
+                const isBest = pack.credits === 20;
                 return (
                   <button
                     key={pack.credits}
+                    type="button"
                     onClick={() => setSelected(pack.credits)}
-                    className={`p-4 rounded-2xl border text-left transition-all ${
-                      isActive
-                        ? "bg-primary/10 border-primary"
-                        : "bg-card border-card-border hover:border-primary"
-                    }`}
+                    className={cn(
+                      "relative rounded-xl border p-4 text-left transition-colors",
+                      active
+                        ? "border-forest bg-forest-light/40"
+                        : "border-border bg-surface hover:border-forest/30"
+                    )}
                   >
-                    <p className="text-2xl font-heading font-black text-white">
+                    {isBest && (
+                      <span className="absolute -top-2 left-3 rounded-full bg-forest px-2 py-0.5 text-[9px] font-medium uppercase text-surface-raised">
+                        Best value
+                      </span>
+                    )}
+                    <p className="text-2xl font-semibold text-ink">
                       {pack.credits}
-                      <span className="text-sm font-bold text-foreground/40">
-                        {" "}
+                      <span className="text-sm font-normal text-ink-muted ml-1">
                         {pack.credits === 1 ? "credit" : "credits"}
                       </span>
                     </p>
-                    <p className="text-sm font-bold text-primary-light mt-1">
+                    <p className="text-sm font-medium text-forest mt-1">
                       {formatNaira(pack.amountKobo)}
                     </p>
+                    {isBest && (
+                      <p className="text-[10px] text-ink-muted mt-1">30% off per verification</p>
+                    )}
                   </button>
                 );
               })}
             </div>
 
+            <p className="text-xs text-ink-muted text-center mb-4">
+              Processed securely by <strong className="text-ink">Squad</strong>. We never see your
+              card details.
+            </p>
+
             {error && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-xl text-xs font-bold text-center">
+              <div className="mb-4 rounded-xl border border-accent/30 bg-accent-soft px-4 py-3 text-sm text-accent text-center">
                 {error}
               </div>
             )}
 
             <button
+              type="button"
               onClick={startPurchase}
               disabled={selected == null || isInitiating}
-              className="w-full bg-primary hover:bg-primary-hover disabled:bg-primary/40 text-white font-bold py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+              className="w-full rounded-xl bg-forest py-3.5 text-sm font-medium text-surface-raised hover:bg-forest-mid disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isInitiating ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" /> Starting...
+                  <Loader2 className="w-4 h-4 animate-spin" /> Starting…
                 </>
               ) : (
                 <>
-                  Pay with Squad <ExternalLink className="w-4 h-4" />
+                  Pay {selectedPack ? formatNaira(selectedPack.amountKobo) : ""} with Squad
+                  <ExternalLink className="w-4 h-4" />
                 </>
               )}
             </button>
@@ -210,42 +212,31 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
         )}
 
         {phase === "awaiting" && (
-          <div className="text-center space-y-6 py-6">
-            <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
-            <div className="space-y-2">
-              <h2 className="text-2xl font-heading font-black">
-                Waiting for payment
-              </h2>
-              <p className="text-foreground/50 font-medium text-sm">
-                Complete the payment in the Squad tab. Your credits appear here
-                automatically once it clears.
-              </p>
-            </div>
+          <div className="text-center py-8 space-y-4">
+            <Loader2 className="w-10 h-10 animate-spin text-forest mx-auto" />
+            <h2 className="text-xl font-semibold">Waiting for payment</h2>
+            <p className="text-sm text-ink-secondary">
+              Complete the payment in the Squad tab. Credits appear here automatically.
+            </p>
             <button
+              type="button"
               onClick={handleClose}
-              className="text-foreground/40 hover:text-white font-bold text-sm transition-colors"
+              className="text-sm text-ink-muted hover:text-forest"
             >
-              I'll do this later
+              I&apos;ll do this later
             </button>
           </div>
         )}
 
         {phase === "done" && (
-          <div className="text-center space-y-6 py-6">
-            <div className="w-16 h-16 rounded-3xl bg-green-500/10 flex items-center justify-center text-green-500 mx-auto">
-              <CheckCircle2 className="w-8 h-8" />
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-2xl font-heading font-black">
-                Credits added
-              </h2>
-              <p className="text-foreground/50 font-medium text-sm">
-                Your balance has been topped up. You're good to verify.
-              </p>
-            </div>
+          <div className="text-center py-8 space-y-4">
+            <CheckCircle2 className="w-12 h-12 text-forest mx-auto" />
+            <h2 className="text-xl font-semibold">Credits added</h2>
+            <p className="text-sm text-ink-secondary">Your balance has been topped up.</p>
             <button
+              type="button"
               onClick={handleClose}
-              className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 rounded-2xl transition-all"
+              className="w-full rounded-xl bg-forest py-3 text-sm font-medium text-surface-raised"
             >
               Done
             </button>
@@ -253,21 +244,14 @@ export default function BuyCreditsModal({ open, onClose, onPurchased }: Props) {
         )}
 
         {phase === "error" && (
-          <div className="text-center space-y-6 py-6">
-            <div className="w-16 h-16 rounded-3xl bg-red-500/10 flex items-center justify-center text-red-500 mx-auto">
-              <AlertTriangle className="w-8 h-8" />
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-2xl font-heading font-black">
-                Payment didn't go through
-              </h2>
-              <p className="text-foreground/50 font-medium text-sm">
-                {error}
-              </p>
-            </div>
+          <div className="text-center py-8 space-y-4">
+            <AlertTriangle className="w-12 h-12 text-accent mx-auto" />
+            <h2 className="text-xl font-semibold">Payment didn&apos;t go through</h2>
+            <p className="text-sm text-ink-secondary">{error}</p>
             <button
+              type="button"
               onClick={() => setPhase("select")}
-              className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 rounded-2xl transition-all"
+              className="w-full rounded-xl bg-forest py-3 text-sm font-medium text-surface-raised"
             >
               Try again
             </button>
