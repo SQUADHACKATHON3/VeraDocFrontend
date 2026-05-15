@@ -14,7 +14,7 @@ import { cn } from "@/lib/cn";
 import HistoryTableSkeleton from "@/components/skeletons/HistoryTableSkeleton";
 
 const PAGE_SIZE = 10;
-const FILTERS = ["All", "AUTHENTIC", "SUSPICIOUS", "FAKE"] as const;
+const FILTERS = ["All", "AUTHENTIC", "NEEDS REVIEW", "FAKE"] as const;
 
 function HistoryContent() {
   const searchParams = useSearchParams();
