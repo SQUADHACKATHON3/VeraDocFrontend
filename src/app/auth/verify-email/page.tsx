@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { api, ApiError } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { Loader2 } from "lucide-react";
+import AuthAside from "@/components/auth/AuthAside";
 
 const DEV_OTP_KEY = "veradoc.devOtp";
 
@@ -146,47 +147,29 @@ export default function VerifyEmailPage() {
   }
 
   return (
-    <div className="vd vd-auth" style={{ minHeight: "100vh" }}>
-      <main className="vd-auth-main" style={{ width: "100%", maxWidth: 480, margin: "0 auto" }}>
-        <div className="vd-auth-form">
+    <div className="vd vd-auth">
+      <main className="vd-auth-main">
+        <div className="vd-auth-form vd-auth-form--verify">
           <p className="vd-auth-kicker">Almost there</p>
           <h1 className="vd-auth-title">
             Verify your <em>email.</em>
           </h1>
-          <p className="vd-verify-lead" style={{ marginBottom: 24 }}>
+          <p className="vd-verify-lead vd-auth-verify-lead">
             We sent a 6-digit code to{" "}
-            <strong style={{ color: "var(--ink)" }}>{user.email}</strong>. Check your inbox
-            and spam folder.
+            <strong>{user.email}</strong>. Check your inbox and spam folder.
           </p>
 
           {devOtp && (
-            <div
-              className="vd-auth-error"
-              style={{
-                marginBottom: 20,
-                background: "var(--forest-tint)",
-                borderColor: "var(--forest-tint-2)",
-                color: "var(--forest)",
-              }}
-            >
-              <strong>Development:</strong> email may not have been delivered (Resend sandbox
-              only sends to your Resend account email). Use code{" "}
-              <span className="vd-mono" style={{ letterSpacing: "0.2em" }}>
-                {devOtp}
-              </span>
+            <div className="vd-auth-dev-otp">
+              <p>
+                We couldn&apos;t deliver email to this address yet. Use this code:{" "}
+                <span className="vd-mono">{devOtp}</span>
+              </p>
             </div>
           )}
 
           <form onSubmit={handleSubmit}>
-            <div
-              className={shake ? "vd-otp-row vd-otp-row--shake" : "vd-otp-row"}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                gap: 8,
-                marginBottom: 24,
-              }}
-            >
+            <div className={shake ? "vd-auth-otp-row vd-auth-otp-row--shake" : "vd-auth-otp-row"}>
               {otp.map((digit, index) => (
                 <input
                   key={index}
@@ -200,32 +183,19 @@ export default function VerifyEmailPage() {
                   onChange={(e) => handleChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   onPaste={handlePaste}
-                  className="vd-input"
-                  style={{
-                    width: 48,
-                    height: 56,
-                    padding: 0,
-                    textAlign: "center",
-                    fontSize: 22,
-                    fontWeight: 600,
-                  }}
+                  className="vd-input vd-auth-otp-digit"
                   aria-label={`Digit ${index + 1}`}
                 />
               ))}
             </div>
 
-            {error && <p className="vd-auth-error" style={{ marginBottom: 16 }}>{error}</p>}
-            {resendSuccess && (
-              <p style={{ marginBottom: 16, fontSize: 14, color: "var(--forest)" }}>
-                Code sent again. Check your email.
-              </p>
-            )}
+            {error && <p className="vd-auth-error">{error}</p>}
+            {resendSuccess && <p className="vd-auth-success">Code sent again. Check your email.</p>}
 
             <button
               type="submit"
               disabled={!isComplete || isLoading}
-              className="vd-btn-pill vd-btn-pill-dark vd-btn-pill--full"
-              style={{ marginBottom: 16 }}
+              className="vd-btn-pill vd-btn-pill-dark vd-btn-pill--full vd-auth-submit"
             >
               {isLoading ? (
                 <>
@@ -237,20 +207,13 @@ export default function VerifyEmailPage() {
               )}
             </button>
 
-            <p style={{ textAlign: "center", fontSize: 13, color: "var(--ink-3)" }}>
+            <p className="vd-auth-resend">
               Didn&apos;t get it?{" "}
               <button
                 type="button"
                 onClick={handleResend}
                 disabled={resendTimer > 0 || isResending}
-                style={{
-                  border: "none",
-                  background: "none",
-                  color: "var(--forest)",
-                  fontWeight: 600,
-                  cursor: resendTimer > 0 || isResending ? "not-allowed" : "pointer",
-                  opacity: resendTimer > 0 || isResending ? 0.5 : 1,
-                }}
+                className="vd-auth-resend-btn"
               >
                 {resendTimer > 0
                   ? `Resend in 0:${resendTimer.toString().padStart(2, "0")}`
@@ -260,14 +223,14 @@ export default function VerifyEmailPage() {
               </button>
             </p>
 
-            <p style={{ textAlign: "center", marginTop: 20, fontSize: 13 }}>
-              <Link href="/auth/login" style={{ color: "var(--ink-3)" }}>
-                ← Back to sign in
-              </Link>
+            <p className="vd-auth-back">
+              <Link href="/auth/login">← Back to sign in</Link>
             </p>
           </form>
         </div>
       </main>
+
+      <AuthAside />
     </div>
   );
 }

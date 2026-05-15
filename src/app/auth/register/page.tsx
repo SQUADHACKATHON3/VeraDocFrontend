@@ -4,8 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import AuthAside from "@/components/auth/AuthAside";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
 
@@ -40,6 +41,7 @@ function passwordStrengthLevel(password: string): number {
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { register: signUp } = useAuth();
@@ -214,18 +216,29 @@ export default function RegisterPage() {
               <label className="vd-field-label" htmlFor="password">
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                disabled={isLoading}
-                placeholder="At least 10 characters"
-                className={`vd-input${errors.password ? " vd-input-error" : ""}`}
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: { value: 10, message: "Minimum 10 characters" },
-                })}
-              />
+              <div className="vd-input-wrap">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  disabled={isLoading}
+                  placeholder="At least 10 characters"
+                  className={`vd-input${errors.password ? " vd-input-error" : ""}`}
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: { value: 10, message: "Minimum 10 characters" },
+                  })}
+                />
+                <button
+                  type="button"
+                  className="vd-input-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  disabled={isLoading}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
               <div
                 className="vd-password-strength"
                 data-level={strength}
@@ -273,6 +286,12 @@ export default function RegisterPage() {
               )}
             </button>
           </form>
+
+          <div className="vd-auth-divider">
+            <span>or</span>
+          </div>
+
+          <GoogleSignInButton disabled={isLoading} onError={setError} />
         </div>
       </main>
     </div>
