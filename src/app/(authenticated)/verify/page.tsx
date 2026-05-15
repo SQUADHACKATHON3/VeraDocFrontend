@@ -141,8 +141,16 @@ export default function VerifyPage() {
   };
 
   const start = async (f?: File) => {
-    const targetFile = f || file;
+    let targetFile = f || file;
     if (!targetFile) return;
+
+    // Reconstruct File object to ensure it's a valid instance (fixes some IDB serialization issues)
+    if (!(targetFile instanceof File)) {
+      targetFile = new File([targetFile], (targetFile as any).name || "document.pdf", {
+        type: (targetFile as any).type || "application/pdf",
+      });
+    }
+
     setBusy(true);
     setError(null);
     try {
@@ -157,7 +165,8 @@ export default function VerifyPage() {
       if (err instanceof ApiError && err.status === 402) {
         setShowBuy(true);
       } else {
-        const msg = err instanceof ApiError ? err.message : "Could not start verification. Please try again.";
+        const size = targetFile ? (targetFile.size / 1024 / 1024).toFixed(2) : "unknown";
+        const msg = err instanceof ApiError ? err.message : `Could not start verification (${size} MB). Please try again.`;
         setError(msg);
       }
     } finally {
