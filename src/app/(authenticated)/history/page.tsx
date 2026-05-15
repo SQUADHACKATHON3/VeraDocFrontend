@@ -118,14 +118,7 @@ function HistoryContent() {
       {isLoading ? (
         <HistoryTableSkeleton />
       ) : (
-        <div className="vd-history-table">
-          <div className="vd-history-table-head">
-            <span>Document</span>
-            <span>Date</span>
-            <span>Verdict</span>
-            <span style={{ textAlign: "right" }}>Trust score</span>
-          </div>
-
+        <div className="vd-history-table-wrap">
           {verifications.length === 0 ? (
             <div className="vd-history-empty">
               <p>No verifications found.</p>
@@ -135,38 +128,47 @@ function HistoryContent() {
               </Link>
             </div>
           ) : (
-            verifications.map((v) => (
-              <Link
-                key={v.id}
-                href={`/verify/${v.id}?from=history`}
-                className="vd-history-row"
-              >
-                <div>
-                  <p className="name">{v.documentName}</p>
-                  <p className="ref">VD-{v.id.slice(0, 4).toUpperCase()}</p>
+            <div className="vd-table-scroll">
+              <div className="vd-history-table">
+                <div className="vd-history-table-head" aria-hidden>
+                  <span>Document</span>
+                  <span>Date</span>
+                  <span>Verdict</span>
+                  <span>Score</span>
+                  <span />
                 </div>
-                <p className="date">
-                  {new Date(v.createdAt).toLocaleString("en-NG", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-                <span className={verdictPillClass(v.verdict)}>
-                  {formatVerdict(v.verdict).toUpperCase()}
-                </span>
-                <div className="score-wrap">
-                  <span className={cn("score", trustScoreClass(v.trustScore))}>
-                    {v.trustScore ?? "—"}
-                  </span>
-                  <span className="view">
-                    View <ArrowRight size={12} />
-                  </span>
-                </div>
-              </Link>
-            ))
+                {verifications.map((v) => (
+                  <Link
+                    key={v.id}
+                    href={`/verify/${v.id}?from=history`}
+                    className="vd-history-row"
+                  >
+                    <div>
+                      <p className="name">{v.documentName}</p>
+                      <p className="ref">VD-{v.id.slice(0, 4).toUpperCase()}</p>
+                    </div>
+                    <p className="date">
+                      {new Date(v.createdAt).toLocaleString("en-NG", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                    <span className={verdictPillClass(v.verdict)}>
+                      {formatVerdict(v.verdict).toUpperCase()}
+                    </span>
+                    <span className={cn("score", trustScoreClass(v.trustScore))}>
+                      {v.trustScore ?? "—"}
+                    </span>
+                    <span className="view">
+                      View <ArrowRight size={12} />
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       )}

@@ -323,7 +323,7 @@ export const api = {
     email: string;
     password: string;
   }) {
-    return request<{ message: string; credits: number }>(
+    return request<{ message: string; credits: number; devOtp?: string }>(
       "/api/auth/register",
       { method: "POST", body: input, auth: false }
     );
@@ -437,7 +437,7 @@ export const api = {
 
   /** Resends the verification OTP. */
   resendOtp() {
-    return request<{ message: string }>("/api/auth/resend-otp", {
+    return request<{ message: string; devOtp?: string }>("/api/auth/resend-otp", {
       method: "POST",
     });
   },

@@ -168,7 +168,8 @@ export default function VerificationReportDocument({
           Per-signal output from the AI vision model. Use this table as evidence in
           any escalation.
         </p>
-        <table className="vd-pdf-table">
+        <div className="vd-table-scroll">
+          <table className="vd-pdf-table">
           <thead>
             <tr>
               <th>Check</th>
@@ -201,7 +202,8 @@ export default function VerificationReportDocument({
               </tr>
             )}
           </tbody>
-        </table>
+          </table>
+        </div>
       </section>
 
       {data.summary && (

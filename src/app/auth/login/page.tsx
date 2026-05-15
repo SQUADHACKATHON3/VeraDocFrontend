@@ -28,8 +28,8 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
     try {
-      await login(data.email, data.password);
-      router.push("/dashboard");
+      const me = await login(data.email, data.password);
+      router.push(me.emailVerified ? "/dashboard" : "/auth/verify-email");
     } catch (err) {
       setError(
         err instanceof ApiError && err.status === 401

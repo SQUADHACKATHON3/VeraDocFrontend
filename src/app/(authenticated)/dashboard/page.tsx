@@ -132,27 +132,39 @@ export default function DashboardPage() {
               </Link>
             </div>
           ) : (
-            verifications.map((v) => (
-              <Link key={v.id} href={`/verify/${v.id}`} className="vd-dash-table-row">
-                <FileText size={18} style={{ color: "var(--ink-3)" }} />
-                <span className="name">{v.documentName}</span>
-                <span className="time">
-                  {new Date(v.createdAt).toLocaleTimeString("en-GB", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-                {v.verdict ? (
-                  <span className={verdictPillClass(v.verdict)}>
-                    {formatVerdict(v.verdict).toUpperCase()}
-                  </span>
-                ) : (
-                  <span className="vd-pill">Pending</span>
-                )}
-                <span className="score">{v.trustScore ?? "—"}</span>
-                <span className="view">View →</span>
-              </Link>
-            ))
+            <div className="vd-table-scroll">
+              <div className="vd-dash-table">
+                <div className="vd-dash-table-head" aria-hidden>
+                  <span />
+                  <span>Document</span>
+                  <span>Time</span>
+                  <span>Verdict</span>
+                  <span>Score</span>
+                  <span />
+                </div>
+                {verifications.map((v) => (
+                  <Link key={v.id} href={`/verify/${v.id}`} className="vd-dash-table-row">
+                    <FileText size={18} style={{ color: "var(--ink-3)" }} />
+                    <span className="name">{v.documentName}</span>
+                    <span className="time">
+                      {new Date(v.createdAt).toLocaleTimeString("en-GB", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                    {v.verdict ? (
+                      <span className={verdictPillClass(v.verdict)}>
+                        {formatVerdict(v.verdict).toUpperCase()}
+                      </span>
+                    ) : (
+                      <span className="vd-pill">Pending</span>
+                    )}
+                    <span className="score">{v.trustScore ?? "—"}</span>
+                    <span className="view">View →</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
           )}
         </div>
 

@@ -28,16 +28,28 @@ export default function DashboardSkeleton() {
             <Skeleton className="vd-skeleton-line md" style={{ width: 160 }} />
             <Skeleton className="vd-skeleton-line sm" style={{ width: 72 }} />
           </div>
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="vd-dash-table-row" style={{ pointerEvents: "none" }}>
-              <SkeletonBlock style={{ width: 18, height: 18, borderRadius: 4 }} />
-              <Skeleton className="vd-skeleton-line" style={{ width: "70%" }} />
-              <Skeleton className="vd-skeleton-line sm" style={{ width: 48 }} />
-              <SkeletonBlock style={{ width: 72, height: 24, borderRadius: 6 }} />
-              <Skeleton className="vd-skeleton-line sm" style={{ width: 32 }} />
-              <Skeleton className="vd-skeleton-line sm" style={{ width: 48 }} />
+          <div className="vd-table-scroll">
+            <div className="vd-dash-table">
+              <div className="vd-dash-table-head" aria-hidden>
+                <span />
+                <span>Document</span>
+                <span>Time</span>
+                <span>Verdict</span>
+                <span>Score</span>
+                <span />
+              </div>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="vd-dash-table-row" style={{ pointerEvents: "none" }}>
+                  <SkeletonBlock style={{ width: 18, height: 18, borderRadius: 4 }} />
+                  <Skeleton className="vd-skeleton-line" style={{ width: "70%" }} />
+                  <Skeleton className="vd-skeleton-line sm" style={{ width: 48 }} />
+                  <SkeletonBlock style={{ width: 72, height: 24, borderRadius: 6 }} />
+                  <Skeleton className="vd-skeleton-line sm" style={{ width: 32 }} />
+                  <Skeleton className="vd-skeleton-line sm" style={{ width: 48 }} />
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
 
         <div className="vd-dash-aside-col">

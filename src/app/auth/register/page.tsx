@@ -15,15 +15,18 @@ type RegisterForm = {
   email: string;
   password: string;
   role: string;
+  roleOther: string;
   agree: boolean;
 };
+
+const OTHER_ROLE = "Other";
 
 const ROLES = [
   "HR officer",
   "University admin",
   "Recruitment agency",
   "Embassy / visa",
-  "Other",
+  OTHER_ROLE,
 ] as const;
 
 function passwordStrengthLevel(password: string): number {
@@ -48,12 +51,20 @@ export default function RegisterPage() {
     setValue,
     formState: { errors },
   } = useForm<RegisterForm>({
-    defaultValues: { role: ROLES[0], agree: false },
+    defaultValues: { role: ROLES[0], roleOther: "", agree: false },
   });
 
   const password = watch("password") ?? "";
   const selectedRole = watch("role");
+  const isOtherRole = selectedRole === OTHER_ROLE;
   const strength = passwordStrengthLevel(password);
+
+  const selectRole = (role: (typeof ROLES)[number]) => {
+    setValue("role", role, { shouldValidate: true });
+    if (role !== OTHER_ROLE) {
+      setValue("roleOther", "", { shouldValidate: true });
+    }
+  };
 
   const onSubmit = async (data: RegisterForm) => {
     if (!data.agree) {
@@ -63,13 +74,16 @@ export default function RegisterPage() {
     setIsLoading(true);
     setError(null);
     try {
-      await signUp({
+      const { devOtp } = await signUp({
         name: data.fullName,
         organisation: data.organisation,
         email: data.email,
         password: data.password,
       });
-      router.push("/dashboard");
+      if (devOtp && typeof sessionStorage !== "undefined") {
+        sessionStorage.setItem("veradoc.devOtp", devOtp);
+      }
+      router.push("/auth/verify-email");
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
         setError("An account with this email already exists");
@@ -165,12 +179,35 @@ export default function RegisterPage() {
                     type="button"
                     className={`vd-role-pill${selectedRole === role ? " active" : ""}`}
                     disabled={isLoading}
-                    onClick={() => setValue("role", role, { shouldValidate: true })}
+                    onClick={() => selectRole(role)}
                   >
                     {role}
                   </button>
                 ))}
               </div>
+              {isOtherRole && (
+                <div className="vd-field vd-role-other">
+                  <label className="vd-field-label" htmlFor="roleOther">
+                    Your role
+                  </label>
+                  <input
+                    id="roleOther"
+                    disabled={isLoading}
+                    placeholder="e.g. Compliance officer"
+                    className={`vd-input${errors.roleOther ? " vd-input-error" : ""}`}
+                    autoFocus
+                    {...register("roleOther", {
+                      validate: (value, formValues) =>
+                        formValues.role === OTHER_ROLE && !value?.trim()
+                          ? "Please describe your role"
+                          : true,
+                    })}
+                  />
+                  {errors.roleOther && (
+                    <p className="vd-field-error">{errors.roleOther.message}</p>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="vd-field">
