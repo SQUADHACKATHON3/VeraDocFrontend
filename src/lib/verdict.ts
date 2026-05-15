@@ -52,3 +52,15 @@ export function forensicVerdictModifier(
   if (v === "FAKE") return "fake";
   return "pending";
 }
+
+/**
+ * Polishes technical strings from the backend (e.g. replacing underscores with spaces)
+ * for a more professional user-facing display.
+ */
+export function formatSignal(text: string | null | undefined): string {
+  if (!text) return "";
+  // Replace underscores with spaces
+  const polished = text.replace(/_/g, " ");
+  // Capitalize first letter if the string is lowercase
+  return polished.charAt(0).toUpperCase() + polished.slice(1);
+}

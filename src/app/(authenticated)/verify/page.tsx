@@ -134,6 +134,7 @@ export default function VerifyPage() {
   }, [step, vid]);
 
   const pick = (f: File) => {
+    if (f.size === 0) return setError("The selected file is empty.");
     if (f.size > MAX) return setError("File exceeds 5 MB.");
     if (!ALLOWED.includes(f.type)) return setError("PDF, JPG, or PNG only.");
     setError(null);
@@ -144,11 +145,17 @@ export default function VerifyPage() {
     let targetFile = f || file;
     if (!targetFile) return;
 
-    // Reconstruct File object to ensure it's a valid instance (fixes some IDB serialization issues)
+    // Reconstruct File object if it's not a proper File instance (e.g. after IDB retrieval)
     if (!(targetFile instanceof File)) {
-      targetFile = new File([targetFile], (targetFile as any).name || "document.pdf", {
+      console.log("Reconstructing file object...", targetFile);
+      const blobData = targetFile instanceof Blob ? targetFile : new Blob([targetFile as any]);
+      targetFile = new File([blobData], (targetFile as any).name || "document.pdf", {
         type: (targetFile as any).type || "application/pdf",
       });
+    }
+
+    if (targetFile.size === 0) {
+      return setError("Could not read file data. Please re-upload the document.");
     }
 
     setBusy(true);
@@ -469,29 +476,39 @@ export default function VerifyPage() {
             </div>
 
             {credits < 1 ? (
-              <button
-                type="button"
-                className="vd-btn-pay"
-                onClick={() => setShowBuy(true)}
-              >
-                Top up to verify
-              </button>
+              <>
+                <button
+                  type="button"
+                  className="vd-btn-pay"
+                  onClick={() => setShowBuy(true)}
+                >
+                  Top up to verify
+                </button>
+                <button
+                  type="button"
+                  className="vd-btn-credit-alt"
+                  disabled={!file || busy}
+                  onClick={payAndVerify}
+                >
+                  Pay per verification
+                </button>
+              </>
             ) : (
               <>
                 <button
                   type="button"
                   className="vd-btn-pay"
                   disabled={!file || busy}
-                  onClick={payAndVerify}
+                  onClick={() => start()}
                 >
                   {busy ? (
                     <>
                       <Loader2 size={16} className="animate-spin" />
-                      Starting…
+                      Analysing…
                     </>
                   ) : (
                     <>
-                      Pay &amp; verify
+                      Use 1 credit to verify
                       <ArrowRight size={16} />
                     </>
                   )}
@@ -500,9 +517,9 @@ export default function VerifyPage() {
                   type="button"
                   className="vd-btn-credit-alt"
                   disabled={!file || busy}
-                  onClick={() => start()}
+                  onClick={payAndVerify}
                 >
-                  Use 1 credit instead
+                  Pay per verification instead
                 </button>
               </>
             )}

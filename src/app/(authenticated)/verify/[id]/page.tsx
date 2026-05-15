@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { api, ApiError, type VerificationDetail } from "@/lib/api";
-import { formatVerdict, forensicVerdictModifier } from "@/lib/verdict";
+import { formatVerdict, forensicVerdictModifier, formatSignal } from "@/lib/verdict";
 import ForensicDetailSkeleton from "@/components/skeletons/ForensicDetailSkeleton";
 
 const FORENSIC_SIGNAL_COUNT = 8;
@@ -250,7 +250,7 @@ export default function VerificationResultPage() {
               {data.flags.map((flag, i) => (
                 <li key={i} className="vd-forensic-flag">
                   <XCircle size={16} strokeWidth={2} />
-                  <span>{flag}</span>
+                  <span>{formatSignal(flag)}</span>
                 </li>
               ))}
             </ul>
@@ -272,7 +272,7 @@ export default function VerificationResultPage() {
               {data.passedChecks.map((check, i) => (
                 <li key={i} className="vd-forensic-pass">
                   <CheckCircle2 size={16} strokeWidth={2} />
-                  <span>{check}</span>
+                  <span>{formatSignal(check)}</span>
                 </li>
               ))}
             </ul>

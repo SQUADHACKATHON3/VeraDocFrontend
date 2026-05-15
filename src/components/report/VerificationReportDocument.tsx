@@ -1,5 +1,5 @@
 import type { VerificationDetail } from "@/lib/api";
-import { formatVerdict, forensicVerdictModifier } from "@/lib/verdict";
+import { formatVerdict, forensicVerdictModifier, formatSignal } from "@/lib/verdict";
 
 type ReportUser = {
   name: string;
@@ -141,7 +141,7 @@ export default function VerificationReportDocument({
           <ul>
             {data.flags.length > 0 ? (
               data.flags.map((f) => (
-                <li key={f}>{f}</li>
+                <li key={f}>{formatSignal(f)}</li>
               ))
             ) : (
               <li>None</li>
@@ -154,7 +154,7 @@ export default function VerificationReportDocument({
           <ul>
             {data.passedChecks.length > 0 ? (
               data.passedChecks.map((c) => (
-                <li key={c}>{c}</li>
+                <li key={c}>{formatSignal(c)}</li>
               ))
             ) : (
               <li>None</li>
@@ -186,7 +186,7 @@ export default function VerificationReportDocument({
             {forensicRows.length > 0 ? (
               forensicRows.map((row) => (
                 <tr key={`${row.result}-${row.check}`}>
-                  <td>{row.check}</td>
+                  <td>{formatSignal(row.check)}</td>
                   <td>
                     <span
                       className={
