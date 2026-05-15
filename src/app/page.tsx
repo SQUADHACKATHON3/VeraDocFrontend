@@ -282,7 +282,7 @@ export default function LandingPage() {
                 <Link href="/auth/register" className="vd-btn vd-btn-primary">
                   Start verifying for free
                 </Link>
-                <a href="mailto:hello@veradoc.ng" className="vd-btn vd-btn-outline">
+                <a href="mailto:veradoc@samkiel.dev" className="vd-btn vd-btn-outline">
                   Book a demo
                 </a>
               </div>
