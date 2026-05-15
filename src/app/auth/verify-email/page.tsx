@@ -146,7 +146,7 @@ export default function VerifyEmailPage() {
   }
 
   return (
-    <motion className="vd vd-auth" style={{ minHeight: "100vh" }}>
+    <div className="vd vd-auth" style={{ minHeight: "100vh" }}>
       <main className="vd-auth-main" style={{ width: "100%", maxWidth: 480, margin: "0 auto" }}>
         <div className="vd-auth-form">
           <p className="vd-auth-kicker">Almost there</p>
