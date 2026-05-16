@@ -13,7 +13,7 @@ export const API_BASE_URL =
 /* Types                                                               */
 /* ------------------------------------------------------------------ */
 
-export type Verdict = "AUTHENTIC" | "SUSPICIOUS" | "FAKE";
+export type Verdict = "AUTHENTIC" | "NEEDS REVIEW" | "FAKE";
 export type VerificationStatus = "pending" | "processing" | "complete" | "error";
 
 export type Tokens = {
