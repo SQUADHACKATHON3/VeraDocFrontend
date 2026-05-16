@@ -222,7 +222,7 @@ export default function RegisterPage() {
                   type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
                   disabled={isLoading}
-                  placeholder="At least 10 characters"
+                  placeholder="At least 8 characters"
                   className={`vd-input${errors.password ? " vd-input-error" : ""}`}
                   {...register("password", {
                     required: "Password is required",
