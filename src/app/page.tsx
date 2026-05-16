@@ -309,7 +309,7 @@ export default function LandingPage() {
             </div>
             <div className="vd-footer-col">
               <h4>Resources</h4>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+              <a href="https://github.com/SQUADHACKATHON3" target="_blank" rel="noopener noreferrer">
                 GitHub
               </a>
               <a href="#">Status</a>
