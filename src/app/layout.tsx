@@ -25,6 +25,7 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("http://localhost:3000"),
   title: "VeraDoc | AI-Powered Certificate Verification",
   description:
     "Stop trusting. Start verifying. VeraDoc detects fake academic certificates and transcripts in seconds using advanced AI forensics.",

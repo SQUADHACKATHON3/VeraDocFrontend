@@ -24,9 +24,9 @@ export default function DashboardPage() {
       try {
         const [all, authentic, suspicious, fake, recent] = await Promise.all([
           api.listVerifications({ limit: 1 }),
-          api.listVerifications({ limit: 1, verdict: "AUTHENTIC" }),
-          api.listVerifications({ limit: 1, verdict: "SUSPICIOUS" }),
-          api.listVerifications({ limit: 1, verdict: "FAKE" }),
+          api.listVerifications({ limit: 1, verdict: "authentic" }),
+          api.listVerifications({ limit: 1, verdict: "suspicious" }),
+          api.listVerifications({ limit: 1, verdict: "fake" }),
           api.listVerifications({ limit: 5 }),
         ]);
         setStats({
