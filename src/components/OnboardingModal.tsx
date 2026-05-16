@@ -108,7 +108,7 @@ export default function OnboardingModal({ open, onComplete }: Props) {
           </div>
 
           {error && (
-            <div className="mt-4 rounded-lg border border-accent/20 bg-accent-soft p-3 text-sm text-accent">
+            <div className="mt-4 rounded-lg border border-accent/20 bg-accent-soft p-3 text-sm text-accent animate-in fade-in slide-in-from-top-2 duration-200">
               {error}
             </div>
           )}

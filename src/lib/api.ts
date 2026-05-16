@@ -410,8 +410,8 @@ export const api = {
   /* --- account --- */
   /** Updates the authenticated user's profile details. */
   updateProfile(input: { name?: string; organisation?: string }) {
-    return request<Me>("/api/user/profile", {
-      method: "PUT",
+    return request<Me>("/api/auth/me", {
+      method: "PATCH",
       body: input,
     });
   },
