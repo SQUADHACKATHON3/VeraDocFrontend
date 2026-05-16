@@ -11,9 +11,9 @@ const HERO_CHECKS = [
 ];
 
 const STATS = [
-  { value: "72%", label: "of HR fraud cases involve fake credentials" },
-  { value: "48 hrs", label: "average time to manually verify one document" },
-  { value: "₦2.4M+", label: "average cost per bad hire from credential fraud" },
+  { value: "2.1%", label: "fake certificate rate covers ~10 years (estimated from 2014–2023, extrapolating the 2019–2023 data)." },
+  { value: "+192%", label: "increase is based on Nigeria's verified document fraud trend (proxy for academic certificates)." },
+  { value: "₦9.12B", label: "loss is confirmed for 2019–2023; the ₦67.6 billion+ projection assumes the +192% fraud increase continues through 2025." },
 ];
 
 const STEPS = [
