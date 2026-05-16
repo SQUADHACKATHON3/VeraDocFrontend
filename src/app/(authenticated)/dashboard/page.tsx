@@ -19,7 +19,10 @@ export default function DashboardPage() {
     fake: 0,
   });
 
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
+
   useEffect(() => {
+    setCurrentTime(new Date());
     const fetchData = async () => {
       try {
         const [all, authentic, suspicious, fake, recent] = await Promise.all([
@@ -45,20 +48,25 @@ export default function DashboardPage() {
     fetchData();
   }, []);
 
-  const hour = new Date().getHours();
+  const hour = currentTime?.getHours() ?? 12;
   const greeting =
     hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
   const firstName = user?.name?.split(" ")[0] ?? "there";
 
-  const dateStr = new Date().toLocaleString("en-GB", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Africa/Lagos",
-    timeZoneName: "short",
-  }).replace(",", " ·");
+  const dateStr = currentTime
+    ? currentTime
+        .toLocaleString("en-GB", {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: "Africa/Lagos",
+          timeZoneName: "short",
+        })
+        .replace(",", " ·")
+    : "";
+
 
   const flagged = stats.suspicious + stats.fake;
   const authenticPct =

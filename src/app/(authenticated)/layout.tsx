@@ -17,18 +17,6 @@ export default function DashboardLayout({
   const router = useRouter();
   const [showBuyCredits, setShowBuyCredits] = useState(false);
 
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    if (searchParams?.get("topup") === "true") {
-      setShowBuyCredits(true);
-      // Clean up the URL
-      const url = new URL(window.location.href);
-      url.searchParams.delete("topup");
-      window.history.replaceState({}, "", url.pathname + url.search);
-    }
-  }, [searchParams]);
-
   useEffect(() => {
     if (!isLoading && !user) {
       router.replace("/auth/login");
@@ -43,6 +31,9 @@ export default function DashboardLayout({
 
   return (
     <div className="vd vd-shell">
+      <Suspense fallback={null}>
+        <SearchParamsHandler onTopUp={() => setShowBuyCredits(true)} />
+      </Suspense>
       <Suspense fallback={null}>
         <AppSidebar
           userName={user.name}
@@ -66,3 +57,20 @@ export default function DashboardLayout({
     </div>
   );
 }
+
+function SearchParamsHandler({ onTopUp }: { onTopUp: () => void }) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams?.get("topup") === "true") {
+      onTopUp();
+      // Clean up the URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete("topup");
+      window.history.replaceState({}, "", url.pathname + url.search);
+    }
+  }, [searchParams, onTopUp]);
+
+  return null;
+}
+

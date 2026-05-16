@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -65,6 +65,14 @@ function TrustGauge({ score }: { score: number }) {
 }
 
 export default function VerificationResultPage() {
+  return (
+    <Suspense fallback={<ForensicDetailSkeleton />}>
+      <VerificationResultContent />
+    </Suspense>
+  );
+}
+
+function VerificationResultContent() {
   const { id } = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const { user } = useAuth();
@@ -444,3 +452,6 @@ export default function VerificationResultPage() {
     </div>
   );
 }
+
+
+
