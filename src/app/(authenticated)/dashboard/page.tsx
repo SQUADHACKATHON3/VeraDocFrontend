@@ -7,7 +7,6 @@ import DashboardSkeleton from "@/components/skeletons/DashboardSkeleton";
 import { useAuth } from "@/context/AuthContext";
 import { api, type VerificationListItem } from "@/lib/api";
 import { formatVerdict, verdictPillClass } from "@/lib/verdict";
-import OnboardingModal from "@/components/OnboardingModal";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -21,13 +20,6 @@ export default function DashboardPage() {
   });
 
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
-  const [showOnboarding, setShowOnboarding] = useState(false);
-
-  useEffect(() => {
-    if (user && !user.organisation && !isLoading) {
-      setShowOnboarding(true);
-    }
-  }, [user, isLoading]);
 
   useEffect(() => {
     setCurrentTime(new Date());
@@ -224,11 +216,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-
-      <OnboardingModal
-        open={showOnboarding}
-        onComplete={() => setShowOnboarding(false)}
-      />
     </>
   );
 }
