@@ -408,6 +408,14 @@ export const api = {
   },
 
   /* --- account --- */
+  /** Updates the authenticated user's profile details. */
+  updateProfile(input: { name?: string; organisation?: string }) {
+    return request<Me>("/api/user/profile", {
+      method: "PUT",
+      body: input,
+    });
+  },
+
   /** Updates the authenticated user's password. */
   changePassword(input: { currentPassword: string; newPassword: string }) {
     return request<{ message: string }>("/api/user/password", {

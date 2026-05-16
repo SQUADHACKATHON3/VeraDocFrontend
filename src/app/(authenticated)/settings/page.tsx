@@ -28,6 +28,16 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileName, setProfileName] = useState("");
+  const [profileOrg, setProfileOrg] = useState("");
+
+  useState(() => {
+    if (user) {
+      setProfileName(user.name || "");
+      setProfileOrg(user.organisation || "");
+    }
+  });
 
   const { register, handleSubmit, watch, reset, formState: { errors } } =
     useForm<PasswordForm>();
@@ -69,6 +79,20 @@ export default function SettingsPage() {
     }
   };
 
+  const onUpdateProfile = async () => {
+    setProfileLoading(true);
+    setError(null);
+    try {
+      await api.updateProfile({ name: profileName, organisation: profileOrg });
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Failed to update profile");
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
   return (
     <div className="vd-settings">
       <p className="vd-dash-meta">Account</p>
@@ -102,19 +126,35 @@ export default function SettingsPage() {
             </button>
           </div>
           {[
-            { label: "Full name", value: user?.name },
-            { label: "Organisation", value: user?.organisation },
-            { label: "Email", value: user?.email, badge: "Verified" },
+            { label: "Full name", value: profileName, onChange: setProfileName },
+            { label: "Organisation", value: profileOrg, onChange: setProfileOrg },
+            { label: "Email", value: user?.email, badge: "Verified", readOnly: true },
           ].map((f) => (
             <div key={f.label} className="vd-settings-field">
               <label>{f.label}</label>
               <div className="vd-settings-field-row">
-                <input readOnly value={f.value ?? ""} className="vd-input" />
+                <input
+                  readOnly={f.readOnly}
+                  value={f.value ?? ""}
+                  onChange={(e) => f.onChange?.(e.target.value)}
+                  className="vd-input"
+                />
                 {f.badge && <span className="vd-settings-badge">{f.badge}</span>}
               </div>
             </div>
           ))}
-          <button type="button" className="vd-btn-pill vd-btn-pill-dark">
+          {success && tab === "Profile" && (
+            <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "var(--forest)", marginBottom: 16 }}>
+              <CheckCircle2 size={16} /> Profile updated
+            </div>
+          )}
+          <button
+            type="button"
+            className="vd-btn-pill vd-btn-pill-dark"
+            onClick={onUpdateProfile}
+            disabled={profileLoading}
+          >
+            {profileLoading && <Loader2 size={16} className="animate-spin" />}
             Save changes
           </button>
         </div>
