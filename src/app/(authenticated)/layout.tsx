@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import AppSidebar from "@/components/layout/AppSidebar";
 import AppShellSkeleton from "@/components/skeletons/AppShellSkeleton";
@@ -16,6 +16,18 @@ export default function DashboardLayout({
   const { user, isLoading, logout, refreshUser } = useAuth();
   const router = useRouter();
   const [showBuyCredits, setShowBuyCredits] = useState(false);
+
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams?.get("topup") === "true") {
+      setShowBuyCredits(true);
+      // Clean up the URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete("topup");
+      window.history.replaceState({}, "", url.pathname + url.search);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!isLoading && !user) {

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2, CheckCircle2, ShieldAlert, Trash2, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { api, ApiError } from "@/lib/api";
@@ -17,6 +18,7 @@ const TABS = ["Profile", "Security", "Billing & credits", "Notifications", "API 
 
 export default function SettingsPage() {
   const { user, logout } = useAuth();
+  const router = useRouter();
   const [tab, setTab] = useState<(typeof TABS)[number]>("Profile");
   const [showDelete, setShowDelete] = useState(false);
   const [deleteText, setDeleteText] = useState("");
@@ -197,7 +199,11 @@ export default function SettingsPage() {
           <p className="vd-settings-lead" style={{ marginBottom: 24 }}>
             ~{user?.credits ?? 0} verifications remaining
           </p>
-          <button type="button" className="vd-btn-pill vd-btn-pill-dark">
+          <button
+            type="button"
+            className="vd-btn-pill vd-btn-pill-dark"
+            onClick={() => router.push("/settings?topup=true")}
+          >
             Top up via Squad
           </button>
         </div>
