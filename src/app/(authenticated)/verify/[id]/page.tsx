@@ -192,9 +192,7 @@ export default function VerificationResultPage() {
           <h1 className="vd-forensic-hero-title">
             {formatVerdict(data.verdict)}.
           </h1>
-          <p className="vd-forensic-hero-lead">
-            {data.summary || "No summary available for this verification."}
-          </p>
+
           <div className="vd-forensic-hero-meta">
             <div className="vd-forensic-file-pill">
               <FileText size={13} strokeWidth={1.5} />

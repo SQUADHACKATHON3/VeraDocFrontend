@@ -55,10 +55,15 @@ function HistoryContent() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
+        const apiVerdict = 
+          filter === "AUTHENTIC" ? "authentic" : 
+          filter === "NEEDS REVIEW" ? "suspicious" : 
+          filter === "FAKE" ? "fake" : undefined;
+
         const data = await api.listVerifications({
           page,
           limit: PAGE_SIZE,
-          verdict: filter !== "All" ? filter : undefined,
+          verdict: apiVerdict,
           search: search || undefined,
         });
         setVerifications(data.data);
